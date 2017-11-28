@@ -1,15 +1,9 @@
 uedinst
 =======
 
-.. image:: https://img.shields.io/appveyor/ci/LaurentRDC/scikit-ued/master.svg
-    :target: https://ci.appveyor.com/project/LaurentRDC/scikit-ued
-    :alt: Windows Build Status
-.. image:: https://readthedocs.org/projects/scikit-ued/badge/?version=master
+.. image:: https://readthedocs.org/projects/uedinst/badge/?version=master
     :target: http://scikit-ued.readthedocs.io
     :alt: Documentation Build Status
-.. image:: https://img.shields.io/pypi/v/scikit-ued.svg
-    :target: https://pypi.python.org/pypi/scikit-ued
-    :alt: PyPI Version
 
 Collection of interfaces for instruments present in the Siwick Laboratory. 
 
