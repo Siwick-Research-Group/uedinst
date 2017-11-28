@@ -1,0 +1,3 @@
+pyvisa >= 1.8
+pyserial >= 3
+numpy>=1.12

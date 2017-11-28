@@ -6,8 +6,22 @@ __pycache__/
 # C extensions
 *.so
 
+# Visual studio cache
+*.vs/
+*.vscode/
+
+# Protein DataBank files and cache folder
+*.ent
+
+# Structure file caches
+*_cache/
+
+# Jupyter notebooks
+notebooks/
+
 # Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -19,7 +33,6 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -42,7 +55,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*.cover
+*,cover
 .hypothesis/
 
 # Translations
@@ -62,11 +75,14 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/source/functions/
+docs/source/classes/
+
 
 # PyBuilder
 target/
 
-# Jupyter Notebook
+# IPython Notebook
 .ipynb_checkpoints
 
 # pyenv
@@ -75,25 +91,20 @@ target/
 # celery beat schedule file
 celerybeat-schedule
 
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# dotenv
 .env
-.venv
-env/
+
+# virtualenv
 venv/
 ENV/
 
 # Spyder project settings
 .spyderproject
-.spyproject
 
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
+# PyCharm
+.idea/
+benchmark.py
+potential_map.py
