@@ -25,6 +25,7 @@ General Documentation
 .. toctree::
     :maxdepth: 3
     
+    api
 
 Authors
 =======
