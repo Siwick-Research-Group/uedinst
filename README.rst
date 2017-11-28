@@ -2,7 +2,7 @@ uedinst
 =======
 
 .. image:: https://readthedocs.org/projects/uedinst/badge/?version=master
-    :target: http://scikit-ued.readthedocs.io
+    :target: http://uedinst.readthedocs.io
     :alt: Documentation Build Status
 
 Collection of interfaces for instruments present in the Siwick Laboratory. 
