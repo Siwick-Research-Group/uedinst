@@ -5,6 +5,7 @@ from pyvisa.resources import GPIBInstrument
 class GPIBBase:
     """ 
     Base class for GPIB instruments. It wraps PyVisa's ResourceManager with open resources.
+    ``GPIBBase`` also supports context managemenent (``with`` statement).
     
     Parameters
     ----------
@@ -18,6 +19,13 @@ class GPIBBase:
         self._rm = ResourceManager()
         self._instrument = self._rm.open_resource(resource_name = addr, **kwargs)
 
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, *exc):
+        self._instrument.close()
+        self._rm.close()
+
     def write(self, *args, **kwargs):
         return self._instrument.write(*args, **kwargs)
     
@@ -26,6 +34,10 @@ class GPIBBase:
     
     def query(self, *args, **kwargs):
         return self._instrument.query(*args, **kwargs)
+
+    write.__doc__ = GPIBInstrument.write.__doc__
+    read.__doc__  = GPIBInstrument.read.__doc__
+    query.__doc__ = GPIBInstrument.query.__doc__
 
     def wait_for_srq(self, timeout = 25000):
         """
@@ -42,14 +54,3 @@ class GPIBBase:
         pyvisa.error.VisaIOError: if timeout has expired
         """
         return self._instrument.wait_for_srq(timeout)
-    
-    write.__doc__ = GPIBInstrument.write.__doc__
-    read.__doc__  = GPIBInstrument.read.__doc__
-    query.__doc__ = GPIBInstrument.query.__doc__
-
-    def __enter__(self):
-        return self
-    
-    def __exit__(self, *exc):
-        self._instrument.close()
-        self._rm.close()
