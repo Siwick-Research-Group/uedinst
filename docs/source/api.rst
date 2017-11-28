@@ -22,6 +22,11 @@ Instrument Classes
     :show-inheritance:
     :member-order:
 
+.. autoclass:: TekPSM4120
+    :members:
+    :show-inheritance:
+    :member-order:
+
 ============
 Base Classes
 ============
