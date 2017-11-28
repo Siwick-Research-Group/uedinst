@@ -12,8 +12,11 @@ class Keithley6514(GPIBBase):
     Interface to Keithley 6514 Electrometer. 
     
     This class supports context management:
-    >>> with Keithley6514(...) as electrometer:
-    >>>     pass
+
+    .. code::
+
+        with Keithley6514('GPIB::15') as electrometer:
+            pass
 
     Parameters
     ----------

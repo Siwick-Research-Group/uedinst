@@ -12,19 +12,21 @@ Reference/API
 Instrument Classes
 ==================
 
-.. autosummary::
-    :toctree: classes/
-    :nosignatures:
+.. autoclass:: SC10Shutter
+    :members:
+    :show-inheritance:
+    :member-order:
 
-    SC10Shutter
-    Keithley6514
+.. autoclass:: Keithley6514
+    :members:
+    :show-inheritance:
+    :member-order:
 
 ============
 Base Classes
 ============
 
-.. autosummary::
-    :toctree: classes/
-    :nosignatures:
-
-    GPIBBase
+.. autoclass:: GPIBBase
+    :members:
+    :show-inheritance:
+    :member-order:
