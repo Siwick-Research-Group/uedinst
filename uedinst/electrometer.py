@@ -39,6 +39,21 @@ class Keithley6514(GPIBBase):
         with suppress(VisaIOError):
             self.write('*RST;*CLS')
         super().__exit__(*exc)
+
+    @property
+    def trigger_source(self):
+        """ Trigger source, one of {'IMM', 'TLIN'} """
+        return self.query('TRIG:SOUR?').strip('\n')
+
+    @property
+    def input_trigger_line(self):
+        """ Input trigger line. Only valid for trigger mode 'TLIN' """
+        return int(self.query('TRIG:TCON:ASYN:ILIN?').strip('\n'))
+
+    @property
+    def measurement_function(self):
+        """ Measurement function, one of {'VOLT', 'CURR', 'RES', 'CHAR'} """
+        return self.query('CONF?').strip('\n')
     
     def error_codes(self):
         """ 
@@ -58,11 +73,6 @@ class Keithley6514(GPIBBase):
         else:
             return None
     
-    @property
-    def trigger_source(self):
-        """ Trigger source, one of {'IMM', 'TLIN'} """
-        return self.query('TRIG:SOUR?').strip('\n')
-    
     def set_trigger_source(self, trig):
         """ 
         Set the trigger source to be either immediate (IMM) or trigger link (TLIN) 
@@ -76,11 +86,6 @@ class Keithley6514(GPIBBase):
             raise ValueError('Trigger source must be either IMM or TLIN, not {}'.format(trig))
         self.write('TRIG:SOUR {}'.format(trig))
     
-    @property
-    def input_trigger_line(self):
-        """ Input trigger line. Only valid for trigger mode 'TLIN' """
-        return int(self.query('TRIG:TCON:ASYN:ILIN?').strip('\n'))
-    
     def set_input_trigger_line(self, line):
         """
         Select input trigger line, from 1 to 6.
@@ -93,11 +98,6 @@ class Keithley6514(GPIBBase):
         if line not in (1,2,3,4,5,6):
             raise ValueError('Input trigger line must be between 1 and 6, not {}'.format(line))
         self.write('TRIG:TCON:ASYN:ILIN {}'.format(str(line)))
-    
-    @property
-    def measurement_function(self):
-        """ Measurement function, one of {'VOLT', 'CURR', 'RES', 'CHAR'} """
-        return self.query('CONF?').strip('\n')
 
     def set_measurement_function(self, func):
         """ Configure the electrometer to one of its measurement 
@@ -135,7 +135,7 @@ class Keithley6514(GPIBBase):
         Raises
         ------
         ValueError: if ``num`` is too large (> 2500)
-        pyvisa.error.VisaIOError: if buffer didn't fill up before timeout expired
+        InstrumentException: if buffer didn't fill up before timeout expired
 
         Notes
         -----

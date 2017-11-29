@@ -35,3 +35,23 @@ Base Classes
     :members:
     :show-inheritance:
     :member-order:
+
+.. autoclass:: SerialBase
+    :members:
+    :show-inheritance:
+    :member-order:
+
+.. autoclass:: MetaInstrument
+    :members:
+    :show-inheritance:
+    :member-order:
+
+=========
+Exception
+=========
+
+Since some instruments can be controlled by either serial connections or GPIB, `uedinst` provides an abstraction
+over both
+
+.. autoexception:: InstrumentException
+    :show-inheritance:

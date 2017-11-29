@@ -1,8 +1,38 @@
 
-from pyvisa import ResourceManager
-from pyvisa.resources import GPIBInstrument
+from abc import ABCMeta
 
-class GPIBBase:
+from pyvisa import ResourceManager
+from pyvisa.errors import VisaIOError
+from pyvisa.resources import GPIBInstrument
+from serial import Serial, SerialException
+
+from . import InstrumentException
+
+
+def general_exception(func, *wrapped_exc):
+    def new_func(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except (VisaIOError, SerialException):
+            raise InstrumentException
+    return new_func
+
+class MetaInstrument(ABCMeta):
+    """
+    Metaclass that wraps all methods so that VisaIOError and SerialException
+    are raised as InstrumentException.
+    """
+
+    def __init__(self, clsname, bases, clsdict):
+        super().__init__(clsname, bases, clsdict)
+
+        for name, value in clsdict.items():
+            if not callable(value): 
+                continue
+            else:
+                setattr(self, name, general_exception(value))
+
+class GPIBBase(metaclass = MetaInstrument):
     """ 
     Base class for GPIB instruments. It wraps PyVisa's ResourceManager with open resources.
     ``GPIBBase`` also supports context managemenent (``with`` statement).
@@ -54,3 +84,6 @@ class GPIBBase:
         pyvisa.error.VisaIOError: if timeout has expired
         """
         return self._instrument.wait_for_srq(timeout)
+
+class SerialBase(Serial, metaclass = MetaInstrument):
+    pass

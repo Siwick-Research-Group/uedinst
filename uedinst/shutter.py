@@ -1,6 +1,6 @@
-import serial
+from . import SerialBase
 
-class SC10Shutter(serial.Serial):
+class SC10Shutter(SerialBase):
 	"""
 	Interface to Thorlabs SC10 shutters.
 
@@ -84,7 +84,7 @@ class SC10Shutter(serial.Serial):
 
 		Raises
 		------
-		SerialException : incomplete write
+		InstrumentException : incomplete write
 		"""
 		if not data.endswith('\r'):
 			data += '\r'
