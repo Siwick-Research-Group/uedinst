@@ -124,7 +124,7 @@ class Keithley6514(GPIBBase):
             Number of measurements to store in buffer. Maximum of 2500 values.
         timeout : int or None, optional
             Timeout of the operation in milliseconds. 
-            If None (default), timeout is disabled
+            If None (default), timeout is disabled.
         
         Returns
         -------
@@ -147,9 +147,7 @@ class Keithley6514(GPIBBase):
 
         self.write('TRIG:COUN {}'.format(num))
 
-        self.write('*SRE 9')                # Lookout for buffer full
-        self.write('STAT:PRES')             # Reset all event lines
-        self.write('STAT:MEAS:ENAB 512')
+        self.write('*SRE 9')                    # Lookout for buffer full
 
         self.write('TRAC:CLE')                  # Clear buffer
         self.write('TRAC:POIN {}'.format(num))  # Set number of buffer points
@@ -162,8 +160,10 @@ class Keithley6514(GPIBBase):
         to_arr = lambda iterable: np.fromiter(map(float, iterable), 
                                               dtype = np.float, count = num)
 
-        # Wait until buffer is full        
+        # Wait until buffer is full
+        # then clear event registers    
         self.wait_for_srq(timeout)
+        self.write('*CLS')
 
         data = self.query('TRAC:DATA?').split(',')
         arr[:,0] = to_arr(data[1::2])   # time
