@@ -9,6 +9,8 @@ if sys.platform == 'win32':
         LB_API2 = CDLL(dll_path)
     except:
         LB_API2 = None
+else:
+    LB_API2 = None
 
 # Error checking
 # Most (all?) functions in the LB_API2 DLL return an int with
