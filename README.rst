@@ -10,7 +10,7 @@ Collection of interfaces for instruments present in the Siwick Laboratory.
 API Reference
 -------------
 
-The `API Reference on readthedocs.io <http://scikit-ued.readthedocs.io>`_ provides API-level documentation, as 
+The `API Reference on readthedocs.io <http://uedinst.readthedocs.io>`_ provides API-level documentation, as 
 well as tutorials.
 
 Installation
