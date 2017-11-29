@@ -65,8 +65,45 @@ def LB_InitializeSensor_Addr(addr):
     LB_API2.LB_InitializeSensor_Addr(addr)
 
 def LB_BlinkLED_Addr(addr):
-    """ Cause the instrument LED to blink four times. """
+    """ 
+    Cause the instrument LED to blink four times. 
+    
+    Parameters
+    ----------
+    addr : int
+        Address of the instrument.
+    """
     LB_API2.LB_BlinkLED_Addr(addr)
+
+psm_models = {-1 : 'unknown', 
+              101: 'PSM4110', 
+              102: 'PSM4120', 
+              103: 'PSM5110',
+              104: 'PSM5120',
+              105: 'PSM3110',
+              106: 'PSM3120',
+              107: 'PSM3310',
+              108: 'PSM3320',
+              109: 'PSM3510',
+              110: 'PSM4410',
+              111: 'PSM4320',
+              112: 'PSM5410',
+              113: 'PSM5320'}
+
+def LB_GetModelNumber_Addr(addr):
+    """ 
+    Get the model number from an address.
+    
+    Parameters
+    ----------
+    addr : int
+        Address of the instrument.
+    
+    Returns
+    -------
+    model : str
+    """
+    return psm_models[LB_API2.LB_GetModelNumber_Addr(addr)]
 
 #######################################################################################
 #           CW MEASUREMENTS
@@ -243,6 +280,12 @@ class TekPSM4120:
             raise RuntimeError('PSM instrument not available.')
         LB_InitializaSensor_Addr(self.addr)
         self.blink_led()
+
+        model = LB_GetModelNumber_Addr(self.addr)
+        try:
+            assert model == 'PSM4120'
+        except:
+            RuntimeError('Unexpected model number: {}'.format(model))
         
         # Set-up default measurement parameters
         self.set_power_units('dBm')
@@ -301,6 +344,12 @@ class TekPSM4120:
             Offset value in current units.
         """
         LB_SetOffset(self.addr, offset)
+
+    @property
+    def power_units(self):
+        """ measurement power units """
+        units = LB_GetMeasurementPowerUnits(self.addr)
+        return self.num_to_units[units]
     
     def set_power_units(self, units):
         """ 
@@ -312,9 +361,3 @@ class TekPSM4120:
             Power units (case insensitive)
         """
         LB_SetMeasurementPowerUnits(self.addr, self.units_to_num[units.lower()])
-    
-    @property
-    def power_units(self):
-        """ measurement power units """
-        units = LB_GetMeasurementPowerUnits(self.addr)
-        return self.num_to_units[units]
