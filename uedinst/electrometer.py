@@ -2,10 +2,10 @@
 from contextlib import suppress
 
 import numpy as np
-from pyvisa import VisaIOError, ResourceManager
+from pyvisa import ResourceManager
 
 from warnings import warn
-from . import GPIBBase
+from . import GPIBBase, InstrumentException
 
 class Keithley6514(GPIBBase):
     """
@@ -36,7 +36,7 @@ class Keithley6514(GPIBBase):
         error_codes = self.error_codes()
         if error_codes:
             warn('Error codes: {}'.format(error_codes), UserWarning)
-        with suppress(VisaIOError):
+        with suppress(InstrumentException):
             self.write('*RST;*CLS')
         super().__exit__(*exc)
 
