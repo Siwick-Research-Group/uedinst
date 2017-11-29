@@ -1,5 +1,5 @@
 
-from contextlib import AbstractContextManager, suppress
+from contextlib import suppress
 
 import numpy as np
 from pyvisa import VisaIOError, ResourceManager
