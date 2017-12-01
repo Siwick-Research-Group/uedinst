@@ -13,6 +13,8 @@ class KLSeries979(RS485Base):
     kwargs 
         Keyword-arguments are passed to RS485Base class.
     """
+    ENCODING = 'ascii'
+
     def __init__(self, port, **kwargs):
         super().__init__(port = port, 
                          baudrate = 9600, 
@@ -23,17 +25,17 @@ class KLSeries979(RS485Base):
 
     def read_until(self, termination, **kwargs):
         """
-        Read continuously until a certain bytestring.
+        Read continuously until a certain string.
 
         Parameters
         ----------
-        termination : bytes
+        termination : str
 
         Returns
         -------
-        data : bytes
+        data : str
         """
-        data = b''
+        data = ''
         while not data.endswith(termination):
             data += self.read()
         return data
@@ -41,21 +43,21 @@ class KLSeries979(RS485Base):
     @property
     def baud_rate(self):
         """ Current baud rate """
-        self.write('@254BR?;FF'.encode('ascii'))
-        value = self.read_until(';FF'.encode('ascii'))
+        self.write('@254BR?;FF')
+        value = self.read_until(';FF')
         return int(value[7:-3])
     
     @property
     def degassing(self):
         """ True if transducer is currently degassing; False otherwise. """
-        self.write('@254DG?;FF'.encode('ascii'))
-        response = self.read_until(';FF'.encode('ascii'))
-        return (response == '@254ACKON;FF'.encode('ascii'))
+        self.write('@254DG?;FF')
+        response = self.read_until(';FF')
+        return (response == '@254ACKON;FF')
     
     def identify(self):
         """ Flash filament power LED on and off to visually identify
         the unit. """
-        self.write('@001TST?;FF'.encode('ascii'))
+        self.write('@001TST?;FF')
     
     def degas(self):
         """ 
@@ -69,8 +71,8 @@ class KLSeries979(RS485Base):
         if curr_pres > 1e-5:
             raise InstrumentException
         else:
-            self.write('@254DG!ON;FF'.encode('ascii'))
-            self.read_until(';FF'.encode('ascii'))
+            self.write('@254DG!ON;FF')
+            self.read_until(';FF')
 
     def pressure(self):
         """ 
@@ -81,8 +83,8 @@ class KLSeries979(RS485Base):
         torr : float
             Instantaneous pressure in Torr 
         """
-        self.write('@254PR3?;FF'.encode('ascii'))
-        value = self.read_until(';FF'.encode('ascii'))
+        self.write('@254PR3?;FF')
+        value = self.read_until(';FF')
 
         # Return value will look like @001ACK1.23E-2;FF
         # Always starts with @xxxACK

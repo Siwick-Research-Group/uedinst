@@ -12,4 +12,5 @@ from .base import GPIBBase, SerialBase, RS485Base, MetaInstrument
 from .electrometer import Keithley6514
 from .powermeter import TekPSM4120
 from .pressure import KLSeries979
+from .psupply import HeinzingerPNChp
 from .shutter import SC10Shutter

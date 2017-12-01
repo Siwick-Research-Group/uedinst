@@ -20,7 +20,6 @@ class TestKeithley6514(unittest.TestCase):
         self.electrometer.set_measurement_function('CHAR')
         self.electrometer.set_trigger_source('IMM')
         data = self.electrometer.acquire_buffered(num = 10, timeout = 20000)
-
         self.assertTupleEqual((10, 2), data.shape)
     
     def test_repeated_acquire_buffered(self):
