@@ -4,18 +4,12 @@ __email__ = 'laurent.renedecotret@mail.mcgill.ca'
 __license__ = 'BSD'
 __version__ = '0.0.1'
 
-from pyvisa.errors import VisaIOError
-from serial import SerialException
-
-# We have an exception
-class InstrumentException(SerialException, VisaIOError):
-    """ 
-    Base exception for instrument-related errors. Abstraction 
-    of pyvisa and pyserial's exceptions. 
-    """
+class InstrumentException(Exception):
+    """ Base exception for instrument-related errors. """
     pass
 
-from .base import GPIBBase, SerialBase, MetaInstrument
+from .base import GPIBBase, SerialBase, RS485Base, MetaInstrument
 from .electrometer import Keithley6514
 from .powermeter import TekPSM4120
+from .pressure import KLSeries979
 from .shutter import SC10Shutter

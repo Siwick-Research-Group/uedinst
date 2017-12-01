@@ -31,6 +31,12 @@ class Keithley6514(GPIBBase):
         super().__init__(addr, **kwargs)
         self.write('*RST;*CLS')
         self.write('FORM:ELEM READ, TIME')
+
+        # Unless the following commands are given
+        # self.wait_for_srq() always times out
+        self.write('STAT:PRES')                 # Reset all event lines
+        self.write('STAT:MEAS:ENAB 512')
+
     
     def __exit__(self, *exc):
         error_codes = self.error_codes()

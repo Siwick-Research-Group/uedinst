@@ -5,6 +5,7 @@ from pyvisa import ResourceManager
 from pyvisa.errors import VisaIOError
 from pyvisa.resources import GPIBInstrument
 from serial import Serial, SerialException
+from serial.rs485 import RS485
 
 from . import InstrumentException
 
@@ -86,4 +87,7 @@ class GPIBBase(metaclass = MetaInstrument):
         return self._instrument.wait_for_srq(timeout)
 
 class SerialBase(Serial, metaclass = MetaInstrument):
+    pass
+
+class RS485Base(RS485, metaclass = MetaInstrument):
     pass

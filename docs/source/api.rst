@@ -27,6 +27,11 @@ Instrument Classes
     :show-inheritance:
     :member-order:
 
+.. autoclass:: KLSeries979
+    :members:
+    :show-inheritance:
+    :member-order:
+
 ============
 Base Classes
 ============
@@ -37,6 +42,11 @@ Base Classes
     :member-order:
 
 .. autoclass:: SerialBase
+    :members:
+    :show-inheritance:
+    :member-order:
+
+.. autoclass:: RS485Base
     :members:
     :show-inheritance:
     :member-order:
@@ -54,4 +64,3 @@ Since some instruments can be controlled by either serial connections or GPIB, `
 over both
 
 .. autoexception:: InstrumentException
-    :show-inheritance:
