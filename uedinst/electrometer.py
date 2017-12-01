@@ -59,7 +59,8 @@ class Keithley6514(GPIBBase):
     @property
     def measurement_function(self):
         """ Measurement function, one of {'VOLT', 'CURR', 'RES', 'CHAR'} """
-        return self.query('CONF?').strip('\n')
+        # query is returned in the form '"VOLT:DC\n"'
+        return self.query('CONF?').strip('\n').replace('"', '')
     
     def error_codes(self):
         """ 
