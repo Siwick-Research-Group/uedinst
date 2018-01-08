@@ -1,5 +1,6 @@
 
 from abc import ABCMeta
+from functools import wraps
 
 from pyvisa import ResourceManager
 from pyvisa.errors import VisaIOError
@@ -87,7 +88,18 @@ class GPIBBase(metaclass = MetaInstrument):
         return self._instrument.wait_for_srq(timeout)
 
 class SerialBase(Serial, metaclass = MetaInstrument):
-    pass
+    """
+    Base class for serial instruments.
+    """
+    ENCODING = 'ascii'
+
+    @wraps(Serial.read)
+    def read(self, *args, **kwargs):
+        return super().read(*args, **kwargs).decode(self.ENCODING)
+
+    @wraps(Serial.write)
+    def write(self, data):
+        return super().write(data.encode(self.ENCODING))
 
 class RS485Base(RS485, metaclass = MetaInstrument):
     pass

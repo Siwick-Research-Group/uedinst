@@ -32,6 +32,11 @@ Instrument Classes
     :show-inheritance:
     :member-order:
 
+.. autoclass:: HeinzingerPNChp
+    :members:
+    :show-inheritance:
+    :member-order:
+
 ============
 Base Classes
 ============
