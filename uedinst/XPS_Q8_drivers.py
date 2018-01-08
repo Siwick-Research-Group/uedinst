@@ -22,16 +22,15 @@ class XPS:
 			XPS.__usedSockets[socketId] = 0
 
 	# Send command and get return
-	def __sendAndReceive (self, socketId, command):
+	def __sendAndReceive (self, socketId, command, encoding = 'utf-8'):
 		try:
-			XPS.__sockets[socketId].send(command)
-			ret = XPS.__sockets[socketId].recv(1024)
+			XPS.__sockets[socketId].send(command.encode(encoding))
+			ret = XPS.__sockets[socketId].recv(1024).decode(encoding)
 			while (ret.find(',EndOfAPI') == -1):
 				ret += XPS.__sockets[socketId].recv(1024)
 		except socket.timeout:
 			return [-2, '']
-		except socket.error (errNb, errString):
-			print('Socket error : ' + errString)
+		except socket.error:
 			return [-2, '']
 
 		for i in range(len(ret)):

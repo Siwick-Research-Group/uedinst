@@ -34,6 +34,19 @@ class MetaInstrument(ABCMeta):
             else:
                 setattr(self, name, general_exception(value))
 
+class Singleton(ABCMeta):
+    """ 
+    Metaclass for singleton classes. Creating a new instance
+    of a singleton class silently returns the existing instance. 
+    """
+
+    _instances = dict()
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
 class GPIBBase(metaclass = MetaInstrument):
     """ 
     Base class for GPIB instruments. It wraps PyVisa's ResourceManager with open resources.

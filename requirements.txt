@@ -1,3 +1,4 @@
 pyvisa >= 1.8
 pyserial >= 3
-numpy>=1.12
+numpy >=1.12
+scipy >= 0.17
