@@ -2,12 +2,13 @@
 from collections.abc import Container
 from contextlib import AbstractContextManager, suppress
 from enum import IntEnum, unique
+from time import sleep
 
 from scipy.constants import speed_of_light as c_vacuum
 air_refractive_index = 1.0003
 c_air = c_vacuum / air_refractive_index    # meters per second
 
-from . import InstrumentException, Singleton, is_valid_IP
+from . import InstrumentException, Singleton, is_valid_IP, timeout
 from .XPS_Q8_drivers import XPS
 
 @unique
@@ -102,6 +103,20 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
     def __exit__(self, *args, **kwargs):
         self.disconnect()
         super().__exit__(*args, **kwargs)
+    
+    def _wait_on_position(self, final):
+        """ 
+        Wait for end of move
+
+        Parameters
+        ----------
+        final : float
+            Expected final absolute position.
+        """
+        final = float(final)
+        with timeout(10, InstrumentException):
+            while self.current_position() != final:
+                sleep(0.1)
 
     def current_position(self):
         """
@@ -112,7 +127,7 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         pos : float
         """
         errcode, position = _errcheck(self._driver.GroupPositionCurrentGet(self.socket_id, self.positioner, nbElement = 1))
-        return position
+        return float(position)
     
     def relative_move(self, move):
         """ 
@@ -123,7 +138,8 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         move : float
         """
         move = str(float(move))
-        return _errcheck(self._driver.GroupMoveRelative(self.socket_id, self.positioner, move))
+        _errcheck(self._driver.GroupMoveRelative(self.socket_id, self.positioner, str(move)))
+        return self._wait_on_position(self.current_position() + move)
     
     def absolute_move(self, move):
         """

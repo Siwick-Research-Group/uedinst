@@ -69,3 +69,12 @@ Since some instruments can be controlled by either serial connections or GPIB, `
 over both
 
 .. autoexception:: InstrumentException
+
+=========
+Utilities
+=========
+
+.. autosummary::
+    
+    is_valid_IP
+    timeout
