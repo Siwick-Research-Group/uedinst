@@ -40,6 +40,13 @@ class XPSQ8Errors(IntEnum):
     NotExpectedPositionAfterMotion          = -221
 
 def _errcheck(returned):
+    """
+    This function checks that any error code is 0 (success)
+    Otherwise, raise an InstrumentException with the correct
+    error code. The ``returned`` value is either an error code
+    or a list (in which case the error code is the first value) 
+    """
+
     with suppress(ValueError):  # unknown error code.
         if isinstance(returned, Container):
             errcode = returned[0]
@@ -105,7 +112,7 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         pos : float
         """
         errcode, position = _errcheck(self._driver.GroupPositionCurrentGet(self.socket_id, self.positioner, nbElement = 1))
-        return float(position)
+        return position
     
     def relative_move(self, move):
         """ 
