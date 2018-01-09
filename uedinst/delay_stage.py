@@ -77,11 +77,13 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
     positioner = group + '.POSITIONER'
 
     def __init__(self, address = '192.168.254.254', **kwargs):
+        self.socket_id = None
+
         # According to TCP_ConnectToServer documentation,
         # port is always 5001
         if not is_valid_IP(address):
             raise ValueError('{} is an invalid IPv4 address'.format(address))
-            
+
         self.socket_id = _errcheck(
             self._driver.TCP_ConnectToServer(IP = address, port = 5001, timeOut = 10))
         
@@ -95,16 +97,15 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         # Get position limits
         errcode, self.min_limit, self.max_limit = _errcheck(self._driver.PositionerUserTravelLimitsGet(self.socket_id, self.positioner))
 
-    def disconnect(self):
-        """ Disconnect from the XPS """
-        with suppress(AttributeError):  # e.g. self.socket_id doesn't exist
-            self._driver.TCP_CloseSocket(self.socket_id)
-
     def __exit__(self, *args, **kwargs):
         self.disconnect()
         super().__exit__(*args, **kwargs)
+
+    def disconnect(self):
+        """ Disconnect from the XPS """
+        self._driver.TCP_CloseSocket(self.socket_id)
     
-    def _wait_on_position(self, final):
+    def _wait_on_position(self, final, tout = 10, tol = 1e-3):
         """ 
         Wait for end of move
 
@@ -112,10 +113,14 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         ----------
         final : float
             Expected final absolute position.
+        tout : float, optional
+            Time-out time in seconds
+        tol : float, optional
+            Position tolerance.
         """
         final = float(final)
-        with timeout(10, InstrumentException):
-            while self.current_position() != final:
+        with timeout(tout, InstrumentException, exc_message = 'Movement timeout'):
+            while abs(self.current_position() - final) > tol:
                 sleep(0.1)
 
     def current_position(self):
@@ -137,8 +142,8 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         ---------- 
         move : float
         """
-        move = str(float(move))
-        _errcheck(self._driver.GroupMoveRelative(self.socket_id, self.positioner, str(move)))
+        move = float(move)
+        _errcheck(self._driver.GroupMoveRelative(self.socket_id, self.positioner, [move]))
         return self._wait_on_position(self.current_position() + move)
     
     def absolute_move(self, move):
@@ -149,8 +154,9 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         ---------- 
         move : float
         """
-        move = str(float(move))
-        return _errcheck(self._driver.GroupMoveAbsolute(self.socket_id, self.positioner, move))
+        move = float(move)
+        _errcheck(self._driver.GroupMoveAbsolute(self.socket_id, self.positioner, [move]))
+        return self._wait_on_position(move)
 
     def relative_time_shift(self, shift):
         """
