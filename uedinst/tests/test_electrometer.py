@@ -9,7 +9,7 @@ with suppress(InstrumentException):
     Keithley6514('GPIB::15')
     HAS_KEITHLEY = True
 
-@unittest.skipIf(not HAS_KEITHLEY, 'Keithley 6514 instrument not connected')
+@unittest.skipIf(not HAS_KEITHLEY, 'Keithley 6514 instrument not connected.')
 class TestKeithley6514(unittest.TestCase):
 
     def setUp(self):

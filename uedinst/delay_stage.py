@@ -8,7 +8,8 @@ from scipy.constants import speed_of_light as c_vacuum
 air_refractive_index = 1.0003
 c_air = c_vacuum / air_refractive_index    # meters per second
 
-from . import InstrumentException, Singleton, is_valid_IP, timeout
+from .base import InstrumentException, Singleton
+from .utils import is_valid_IP, timeout
 from .XPS_Q8_drivers import XPS
 
 @unique
@@ -32,7 +33,7 @@ class XPSQ8Errors(IntEnum):
     MoveAborted                             = -27
     HomeSearchTimeout                       = -28
     MotionDoneTimeout                       = -33
-    PositionOutsideLimits                   = -35
+    PositionOutsideTravelLimits             = -35
     SlaveErrorDisablingMaster               = -44
     InconsistentMechanicalZero              = -49
     MotorInitiError                         = -50
@@ -47,9 +48,10 @@ def _errcheck(returned):
     error code. The ``returned`` value is either an error code
     or a list (in which case the error code is the first value) 
     """
-
+    if returned is None:
+        raise ValueError('None has been returned')
     with suppress(ValueError):  # unknown error code.
-        if isinstance(returned, Container):
+        if isinstance(returned, list):
             errcode = returned[0]
         else:
             errcode = returned
@@ -58,9 +60,11 @@ def _errcheck(returned):
             raise InstrumentException(error)
     return returned
 
-class DelayStage(AbstractContextManager, metaclass = Singleton):
+class DelayStage(AbstractContextManager):
     """
-    Interface to Newport XPS Q8
+    Abstract interface to one delay-stage
+    connected to a Newport XPS Q8.
+
     Parameters
     ----------
     address : str, optional
@@ -73,11 +77,12 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
     """
     _driver = XPS()
 
-    group = 'GROUP5'
-    positioner = group + '.POSITIONER'
+    # group and positioner must be overriden in subclasses
+    group = ''
+    positioner = group + ''
 
-    def __init__(self, address = '192.168.254.254', **kwargs):
-        self.socket_id = None
+    def __init__(self, address, **kwargs):
+        #self.socket_id = None
 
         # According to TCP_ConnectToServer documentation,
         # port is always 5001
@@ -105,23 +110,32 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         """ Disconnect from the XPS """
         self._driver.TCP_CloseSocket(self.socket_id)
     
-    def _wait_on_position(self, final, tout = 10, tol = 1e-3):
+    def _wait_end_of_move(self, tout = 10, tol = 5e-3):
         """ 
-        Wait for end of move
+        Wait for end of move, i.e. when the current position is close
+        enough to the target.
 
         Parameters
         ----------
-        final : float
-            Expected final absolute position.
         tout : float, optional
             Time-out time in seconds
         tol : float, optional
             Position tolerance.
         """
-        final = float(final)
         with timeout(tout, InstrumentException, exc_message = 'Movement timeout'):
-            while abs(self.current_position() - final) > tol:
+            while abs(self.current_position() - self.target_position()) > tol:
                 sleep(0.1)
+    
+    def target_position(self):
+        """
+        Get the current absolute position setpoint
+
+        Returns
+        -------
+        pos : float
+        """
+        errcode, position = _errcheck(self._driver.GroupPositionTargetGet(self.socket_id, self.positioner, nbElement = 1))
+        return float(position)
 
     def current_position(self):
         """
@@ -136,31 +150,40 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
     
     def relative_move(self, move):
         """ 
-        Move the delay stage relatively to current position, by distance.
+        Move the delay stage relatively to current position, by distance. This
+        function returns when move is completed.
         
         Parameters
         ---------- 
         move : float
+            Relative move [mm]
         """
         move = float(move)
+        # For some reason, the targetDisplacement parameter
+        # to GroupMoveRelative should be an iterable...
         _errcheck(self._driver.GroupMoveRelative(self.socket_id, self.positioner, [move]))
-        return self._wait_on_position(self.current_position() + move)
+        return self._wait_end_of_move()
     
     def absolute_move(self, move):
         """
-        Move the delay stage to a new absolute position, by distance.
+        Move the delay stage to a new absolute position, by distance. This
+        function returns when move is completed.
         
         Parameters
         ---------- 
         move : float
+            Absolute move [mm]
         """
         move = float(move)
+        # For some reason, the targetDisplacement parameter
+        # to GroupMoveAbsolute should be an iterable...
         _errcheck(self._driver.GroupMoveAbsolute(self.socket_id, self.positioner, [move]))
-        return self._wait_on_position(move)
+        return self._wait_end_of_move()
 
     def relative_time_shift(self, shift):
         """
-        Move the delay stage to achieve a certain time-shift.
+        Move the delay stage to achieve a certain time-shift. This
+        function returns when move is completed.
 
         Parameters
         ----------
@@ -169,6 +192,19 @@ class DelayStage(AbstractContextManager, metaclass = Singleton):
         """
         # Distance to move is half because of back-and-forth motion
         # along the stage
-        # TODO: units of move, meters or microns?
+        # Note: movement units are in *millimeters*
         move_meters = shift * c_air / 2
-        return self.relative_move(move_meters)
+        move = move_meters / 1e3
+        return self.relative_move(move)
+
+class ILS250PP(DelayStage):
+    """
+    Interface to an ILS250PP delay-stage connected
+    to a Newport XPS Q8 positioner.
+    """
+
+    group = 'GROUP5'
+    positioner = group + '.POSITIONER'
+
+    def __init__(self, address = '192.168.254.254', **kwargs):
+        super().__init__(address, **kwargs)

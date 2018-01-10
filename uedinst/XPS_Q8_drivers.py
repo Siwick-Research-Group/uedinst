@@ -57,7 +57,7 @@ class XPS:
 			XPS.__sockets[socketId].setblocking(1)
 		except socket.error:
 			return -1
-
+		
 		return socketId
 
 	# TCP_SetTimeout
@@ -1242,6 +1242,7 @@ class XPS:
 	# GroupMoveAbsolute :  Do an absolute move
 	def GroupMoveAbsolute (self, socketId, GroupName, TargetPosition):
 		if (XPS.__usedSockets[socketId] == 0):
+			raise RuntimeError
 			return
 
 		command = 'GroupMoveAbsolute(' + GroupName + ','
@@ -1258,6 +1259,7 @@ class XPS:
 	# GroupMoveRelative :  Do a relative move
 	def GroupMoveRelative (self, socketId, GroupName, TargetDisplacement):
 		if (XPS.__usedSockets[socketId] == 0):
+			raise RuntimeError
 			return
 
 		command = 'GroupMoveRelative(' + GroupName + ','
@@ -1376,6 +1378,7 @@ class XPS:
 		command += ')'
 
 		[error, returnedString] = self.__sendAndReceive(socketId, command)
+		
 		if (error != 0):
 			return [error, returnedString]
 
@@ -1385,7 +1388,6 @@ class XPS:
 				j += 1
 			retList.append(eval(returnedString[i:i+j]))
 			i, j = i+j+1, 0
-
 		return retList
 
 
