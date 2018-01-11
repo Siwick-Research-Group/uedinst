@@ -6,7 +6,7 @@ from .. import SC10Shutter, InstrumentException
 
 HAS_SC10 = False
 with suppress(InstrumentException):
-    SC10Shutter('GPIB::15')
+    SC10Shutter('COM11')        # probe shutter
     HAS_SC10 = True
 
 @unittest.skipIf(not HAS_SC10, 'No SC10Shutter is connected')
