@@ -115,4 +115,15 @@ class SerialBase(Serial, metaclass = MetaInstrument):
         return super().write(data.encode(self.ENCODING))
 
 class RS485Base(RS485, metaclass = MetaInstrument):
-    pass
+    """
+    Base class for RS485 instruments.
+    """
+    ENCODING = 'ascii'
+
+    @wraps(RS485.read)
+    def read(self, *args, **kwargs):
+        return super().read(*args, **kwargs).decode(self.ENCODING)
+
+    @wraps(RS485.write)
+    def write(self, data):
+        return super().write(data.encode(self.ENCODING))
