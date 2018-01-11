@@ -52,3 +52,6 @@ class TestILS250PP(unittest.TestCase):
             new_pos = delay_stage.current_position()
         
         self.assertAlmostEqual(new_pos, expected, places = 2)
+
+if __name__ == '__main__':
+    unittest.main()
