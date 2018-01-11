@@ -193,8 +193,8 @@ class DelayStage(AbstractContextManager):
         # Distance to move is half because of back-and-forth motion
         # along the stage
         # Note: movement units are in *millimeters*
-        move_meters = shift * c_air / 2
-        move = move_meters / 1e3
+        move_meters = (shift / 1e12) * (c_air / 2)
+        move = move_meters * 1e3
         return self.relative_move(move)
 
 class ILS250PP(DelayStage):
