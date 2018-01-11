@@ -37,4 +37,18 @@ class TestILS250PP(unittest.TestCase):
             curr_pos = delay_stage.current_position()
         
         self.assertAlmostEqual(curr_pos, start + move, places = 2)
-
+    
+    def test_relative_time_shift(self):
+        """ Test that the relative_time_shift() method moves by an
+        appropriate amount """
+        # Expected distance for 30 ps
+        # recall that the stage moving by x means that the
+        # path length changes by 2x
+        expected = (30e-12) * 3e8 / 2 * 1e3 # ~ 4.5 mm
+        
+        with ILS250PP() as delay_stage:
+            delay_stage.absolute_move(0.0)
+            delay_stage.relative_time_shift(30)
+            new_pos = delay_stage.current_position()
+        
+        self.assertAlmostEqual(new_pos, expected, places = 2)

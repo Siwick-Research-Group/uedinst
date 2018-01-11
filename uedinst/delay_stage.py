@@ -1,5 +1,4 @@
 
-from collections.abc import Container
 from contextlib import AbstractContextManager, suppress
 from enum import IntEnum, unique
 from time import sleep
@@ -8,7 +7,7 @@ from scipy.constants import speed_of_light as c_vacuum
 air_refractive_index = 1.0003
 c_air = c_vacuum / air_refractive_index    # meters per second
 
-from .base import InstrumentException, Singleton
+from .base import InstrumentException
 from .utils import is_valid_IP, timeout
 from .XPS_Q8_drivers import XPS
 
@@ -105,6 +104,15 @@ class DelayStage(AbstractContextManager):
     def __exit__(self, *args, **kwargs):
         self.disconnect()
         super().__exit__(*args, **kwargs)
+    
+    @staticmethod
+    def delay_to_distance(delay):
+        """ Calculate the distance by which to move [mm] for light round-trip
+        of ``delay`` picoseconds """
+        # Distance to move is half because of back-and-forth motion
+        # along the stage
+        move_meters = (delay / 1e12) * (c_air / 2)
+        return move_meters * 1e3
 
     def disconnect(self):
         """ Disconnect from the XPS """
@@ -190,12 +198,8 @@ class DelayStage(AbstractContextManager):
         shift : float
             Time-shift in picoseconds
         """
-        # Distance to move is half because of back-and-forth motion
-        # along the stage
-        # Note: movement units are in *millimeters*
-        move_meters = (shift / 1e12) * (c_air / 2)
-        move = move_meters * 1e3
-        return self.relative_move(move)
+        shift = float(shift)
+        return self.relative_move(self.delay_to_distance(shift))
 
 class ILS250PP(DelayStage):
     """

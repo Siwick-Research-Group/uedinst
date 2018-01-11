@@ -37,6 +37,11 @@ Instrument Classes
     :show-inheritance:
     :member-order:
 
+.. autoclass:: ILS250PP
+    :members:
+    :show-inheritance:
+    :member-order:
+
 ============
 Base Classes
 ============
