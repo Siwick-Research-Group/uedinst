@@ -4,7 +4,7 @@ from contextlib import suppress
 from random import random
 from time import sleep
 
-from .. import ILS250PP, InstrumentException
+from .. import ILS250PP, DelayStage, InstrumentException
 
 HAS_STAGE = False
 with suppress(InstrumentException):
@@ -52,6 +52,13 @@ class TestILS250PP(unittest.TestCase):
             new_pos = delay_stage.current_position()
         
         self.assertAlmostEqual(new_pos, expected, places = 2)
+    
+    def test_static_methods(self):
+        """ Test that the delay_to_distance() and distance_to_delay() methods are inverse of each other """
+        dist = random_pos()
+
+        delay = ILS250PP.distance_to_delay(dist)
+        self.assertAlmostEqual(ILS250PP.delay_to_distance(delay), dist, places = 8)
 
 if __name__ == '__main__':
     unittest.main()

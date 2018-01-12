@@ -113,6 +113,13 @@ class DelayStage(AbstractContextManager):
         # along the stage
         move_meters = (delay / 1e12) * (c_air / 2)
         return move_meters * 1e3
+    
+    @staticmethod
+    def distance_to_delay(dist):
+        """ Calculate the extra time [ps] it takes for light to make a round-trip
+        if the stage moves by ``dist`` millimeters. """
+        extra_path = 2 * float(dist) / 1e3  # extra path [meters]
+        return (extra_path / c_air) * 1e12  # [picoseconds]
 
     def disconnect(self):
         """ Disconnect from the XPS """
