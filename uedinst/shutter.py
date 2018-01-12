@@ -88,7 +88,7 @@ class SC10Shutter(SerialBase):
 		"""
 		if not data.endswith('\r'):
 			data += '\r'
-		return super().write(data.encode('ascii'), **kwargs)
+		return super().write(data, **kwargs)
 
 	def query(self, data, **kwargs):
 		"""
