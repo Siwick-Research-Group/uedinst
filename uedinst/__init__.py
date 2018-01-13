@@ -5,8 +5,8 @@ __license__ = 'BSD'
 __version__ = '0.0.1'
 
 class InstrumentException(Exception):
-    """ Base exception for instrument-related errors. """
-    pass
+	""" Base exception for instrument-related errors. """
+	pass
 
 from .base import GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
 from .delay_stage import ILS250PP

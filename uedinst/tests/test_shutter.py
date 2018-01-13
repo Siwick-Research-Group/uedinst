@@ -1,6 +1,8 @@
 
 import unittest
 from contextlib import suppress
+from random import randint, seed, choice
+seed(23)
 
 from .. import SC10Shutter, InstrumentException
 
@@ -14,7 +16,6 @@ class TestSC10Shutter(unittest.TestCase):
 
     def setUp(self):
         self.shutter = SC10Shutter('COM11')
-        self.shutter.readall()  # clear buffer 
     
     def tearDown(self):
         self.shutter.close()
@@ -27,15 +28,27 @@ class TestSC10Shutter(unittest.TestCase):
     
     def test_operating_mode(self):
         """ Test that setting the operating mode and retrieving works """
-        for op_mode in self.shutter._op_modes:
-            self.shutter.set_operating_mode(op_mode)
-            self.assertEqual(op_mode, self.shutter.operating_mode)
+        op_mode = choice(list(self.shutter.OperatingModes))
+        self.shutter.set_operating_mode(op_mode)
+        self.assertEqual(op_mode, self.shutter.operating_mode)
     
-    def test_trigger_move(self):
+    def test_trigger_mode(self):
         """ Test that setting the trigger mode and retrieving it works """
-        for trig_mode in self.shutter._trigger_modes:
-            self.shutter.set_trigger_mode(trig_mode)
-            self.assertEqual(trig_mode, self.shutter.trigger_mode)
+        trig_mode = choice(list(self.shutter.TriggerModes))
+        self.shutter.set_trigger_mode(trig_mode)
+        self.assertEqual(trig_mode, self.shutter.trigger_mode)
+    
+    def test_open_time(self):
+        """ Test that setting the open time to a random number is working correctly """
+        open_time = randint(1, 100)
+        self.shutter.set_open_time(open_time)
+        self.assertEqual(open_time, self.shutter.shutter_open_time)
+    
+    def test_repeat_count(self):
+        """ Test that the repeat count can be set and retrieved """
+        repeat_count = randint(1, 100)
+        self.shutter.set_repeat_count(repeat_count)
+        self.assertEqual(repeat_count, self.shutter.repeat_count)
         
 
 if __name__ == '__main__':

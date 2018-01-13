@@ -4,7 +4,7 @@ from contextlib import suppress
 from random import random
 from time import sleep
 
-from .. import ILS250PP, DelayStage, InstrumentException
+from .. import ILS250PP, InstrumentException
 
 HAS_STAGE = False
 with suppress(InstrumentException):

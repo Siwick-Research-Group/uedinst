@@ -1,6 +1,7 @@
 
 from abc import ABCMeta
 from functools import wraps
+from types import FunctionType
 
 from pyvisa import ResourceManager
 from pyvisa.errors import VisaIOError
@@ -29,7 +30,7 @@ class MetaInstrument(ABCMeta):
         super().__init__(clsname, bases, clsdict)
 
         for name, value in clsdict.items():
-            if not callable(value): 
+            if not isinstance(value, FunctionType): 
                 continue
             else:
                 setattr(self, name, general_exception(value))
@@ -106,13 +107,46 @@ class SerialBase(Serial, metaclass = MetaInstrument):
     """
     ENCODING = 'ascii'
 
-    @wraps(Serial.read)
-    def read(self, *args, **kwargs):
+    def read_str(self, *args, **kwargs):
+        """
+        Read strings from instrument. Strings are automatically
+        decoded.
+
+        Parameters
+        ----------
+        size : int
+            Number of bytes to read. Bytes are decoded in according to the 
+            instrument's ``ENCODING`` attribute.
+
+        Returns
+        -------
+        data : str
+            Read information. If the instrument timeout was exceeded,
+            ``data`` will be an empty or incomplete string.
+        """
         return super().read(*args, **kwargs).decode(self.ENCODING)
 
-    @wraps(Serial.write)
-    def write(self, data):
-        return super().write(data.encode(self.ENCODING))
+    def write_str(self, data, *args, **kwargs):
+        """
+        Write strings to instrument. Strings are automatically
+        encoded.
+
+        Parameters
+        ----------
+        data : str
+            Data to be sent. Strings are encoded in according to the 
+            instrument's ``ENCODING`` attribute.
+
+        Returns
+        -------
+        sent : int
+            Number of bytes successfully written.
+
+        Raises
+        ------
+        InstrumentException : incomplete write
+        """
+        return super().write(data.encode(self.ENCODING), *args, **kwargs)
 
 class RS485Base(RS485, metaclass = MetaInstrument):
     """
@@ -120,10 +154,43 @@ class RS485Base(RS485, metaclass = MetaInstrument):
     """
     ENCODING = 'ascii'
 
-    @wraps(RS485.read)
-    def read(self, *args, **kwargs):
+    def read_str(self, *args, **kwargs):
+        """
+        Read strings from instrument. Strings are automatically
+        decoded.
+
+        Parameters
+        ----------
+        size : int
+            Number of bytes to read. Bytes are decoded in according to the 
+            instrument's ``ENCODING`` attribute.
+
+        Returns
+        -------
+        data : str
+            Read information. If the instrument timeout was exceeded,
+            ``data`` will be an empty or incomplete string.
+        """
         return super().read(*args, **kwargs).decode(self.ENCODING)
 
-    @wraps(RS485.write)
-    def write(self, data):
-        return super().write(data.encode(self.ENCODING))
+    def write_str(self, data, *args, **kwargs):
+        """
+        Write strings to instrument. Strings are automatically
+        encoded.
+
+        Parameters
+        ----------
+        data : str
+            Data to be sent. Strings are encoded in according to the 
+            instrument's ``ENCODING`` attribute.
+
+        Returns
+        -------
+        sent : int
+            Number of bytes successfully written.
+
+        Raises
+        ------
+        InstrumentException : incomplete write
+        """
+        return super().write(data.encode(self.ENCODING), *args, **kwargs)
