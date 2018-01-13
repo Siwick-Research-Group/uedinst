@@ -37,7 +37,7 @@ class KLSeries979(RS485Base):
         """
         data = ''
         while not data.endswith(termination):
-            data += self.read()
+            data += self.read_str()
         return data
     
     @property
@@ -50,14 +50,14 @@ class KLSeries979(RS485Base):
     @property
     def degassing(self):
         """ True if transducer is currently degassing; False otherwise. """
-        self.write('@254DG?;FF')
+        self.write_str('@254DG?;FF')
         response = self.read_until(';FF')
         return (response == '@254ACKON;FF')
     
     def identify(self):
         """ Flash filament power LED on and off to visually identify
         the unit. """
-        self.write('@001TST?;FF')
+        self.write_str('@001TST?;FF')
     
     def degas(self):
         """ 
@@ -71,7 +71,7 @@ class KLSeries979(RS485Base):
         if curr_pres > 1e-5:
             raise InstrumentException
         else:
-            self.write('@254DG!ON;FF')
+            self.write_str('@254DG!ON;FF')
             self.read_until(';FF')
 
     def pressure(self):
@@ -83,7 +83,7 @@ class KLSeries979(RS485Base):
         torr : float
             Instantaneous pressure in Torr 
         """
-        self.write('@254PR3?;FF')
+        self.write_str('@254PR3?;FF')
         value = self.read_until(';FF')
 
         # Return value will look like @001ACK1.23E-2;FF
