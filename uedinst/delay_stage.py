@@ -217,5 +217,7 @@ class ILS250PP(DelayStage):
     group = 'GROUP5'
     positioner = group + '.POSITIONER'
 
+    # Internet address : 132.206.175.95
+    # local address    : 192.168.254.254
     def __init__(self, address = '192.168.254.254', **kwargs):
         super().__init__(address, **kwargs)
