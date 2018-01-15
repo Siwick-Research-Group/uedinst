@@ -199,5 +199,5 @@ class SC10Shutter(SerialBase):
 		"""
 		count = int(count)
 		if count > 99 or count < 1:
-			raise ValueError('Repeat count must be between 1 and 99 inclusively.')
+			raise ValueError('Repeat count {} not in [1, 99] range'.format(count))
 		self.query_str('rep={}'.format(count))
