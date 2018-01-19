@@ -19,6 +19,8 @@ class SC10Shutter(SerialBase):
 		Keyword-arguments are passed to serial.Serial class.
 	"""
 
+	BAUDRATES = (9600, 115200)
+
 	class TriggerModes(IntEnum):
 		internal = 0
 		external = 1
@@ -35,9 +37,6 @@ class SC10Shutter(SerialBase):
 					   'baudrate': 9600, 
 					   'timeout':  1.0})
 		super().__init__(**kwargs)
-		# Clear buffer which might not be empty due to errors
-		self.reset_input_buffer()
-		self.reset_output_buffer()
 
 	@property
 	def enabled(self):
@@ -98,7 +97,7 @@ class SC10Shutter(SerialBase):
 		if not data.endswith('\r'):
 			data += '\r'
 		sent = self.write_str(data, **kwargs)
-		bytes_answer = self.readall()
+		bytes_answer = self.read_until('\r')
 		raw = bytes_answer.decode('ascii')
 
 		# Answer *might* have added \r, '>', or the command itself

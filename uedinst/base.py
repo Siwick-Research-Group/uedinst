@@ -107,6 +107,12 @@ class SerialBase(Serial, metaclass = MetaInstrument):
     """
     ENCODING = 'ascii'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Clear buffer which might not be empty due to errors
+        self.reset_input_buffer()
+        self.reset_output_buffer()
+
     def read_str(self, *args, **kwargs):
         """
         Read strings from instrument. Strings are automatically
@@ -146,7 +152,9 @@ class SerialBase(Serial, metaclass = MetaInstrument):
         ------
         InstrumentException : incomplete write
         """
-        return super().write(data.encode(self.ENCODING), *args, **kwargs)
+        returned = super().write(data.encode(self.ENCODING), *args, **kwargs)
+        self.flush()	# wait until all data is written
+        return returned
 
 class RS485Base(RS485, metaclass = MetaInstrument):
     """
@@ -193,4 +201,6 @@ class RS485Base(RS485, metaclass = MetaInstrument):
         ------
         InstrumentException : incomplete write
         """
-        return super().write(data.encode(self.ENCODING), *args, **kwargs)
+        returned = super().write(data.encode(self.ENCODING), *args, **kwargs)
+        self.flush()	# wait until all data is written
+        return returned
