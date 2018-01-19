@@ -3,10 +3,6 @@ from .base import SerialBase
 from .utils import timeout
 from enum import IntEnum
 
-# TODO: modes as enum
-
-
-
 class SC10Shutter(SerialBase):
 	"""
 	Interface to Thorlabs SC10 shutters.
@@ -19,7 +15,8 @@ class SC10Shutter(SerialBase):
 		Keyword-arguments are passed to serial.Serial class.
 	"""
 
-	BAUDRATES = (9600, 115200)
+	BAUDRATES 	= (9600, 115200)
+	ENCODING 	= 'ascii'
 
 	class TriggerModes(IntEnum):
 		internal = 0
@@ -35,7 +32,7 @@ class SC10Shutter(SerialBase):
 	def __init__(self, port, **kwargs):
 		kwargs.update({'port':     port,
 					   'baudrate': 9600, 
-					   'timeout':  1.0})
+					   'timeout':  2.0})
 		super().__init__(**kwargs)
 
 	@property
@@ -97,8 +94,7 @@ class SC10Shutter(SerialBase):
 		if not data.endswith('\r'):
 			data += '\r'
 		sent = self.write_str(data, **kwargs)
-		bytes_answer = self.read_until('\r')
-		raw = bytes_answer.decode('ascii')
+		raw = self.read_until('\r').decode(self.ENCODING)
 
 		# Answer *might* have added \r, '>', or the command itself
 		# data.strip() is data without the '\r' at the end

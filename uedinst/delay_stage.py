@@ -9,7 +9,7 @@ c_air = c_vacuum / air_refractive_index    # meters per second
 
 from .base import InstrumentException
 from .utils import is_valid_IP, timeout
-from .XPS_Q8_drivers import XPS
+from .XPS_C8_drivers import XPS
 
 @unique
 class XPSQ8Errors(IntEnum):
