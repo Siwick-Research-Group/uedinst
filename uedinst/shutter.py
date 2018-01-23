@@ -34,6 +34,9 @@ class SC10Shutter(SerialBase):
 					   'baudrate': 9600, 
 					   'timeout':  2.0})
 		super().__init__(**kwargs)
+		self.read_all()
+		self.set_trigger_mode(self.TriggerModes.external)
+		self.set_operating_mode(self.OperatingModes.gated)
 
 	@property
 	def enabled(self):

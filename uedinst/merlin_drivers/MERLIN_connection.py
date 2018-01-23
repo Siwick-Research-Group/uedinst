@@ -7,13 +7,15 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 import struct
+from os.path import dirname, join
 
 
 class MERLIN_connection: 
 
     ENCODING = 'ascii'
 
-    def __init__(self, hostname='diamrd', ipaddress ='000', channel = 'cmd',varFile='ListOfCurrentTCPvariables.txt'):
+    def __init__(self, hostname='diamrd', ipaddress ='000', channel = 'cmd',
+                 varFile=join(dirname(__file__), 'ListOfCurrentTCPvariables.txt')):
     
        
         self.varsTCPcontrolled = {}

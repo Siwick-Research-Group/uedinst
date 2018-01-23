@@ -1,6 +1,10 @@
 
 from contextlib import AbstractContextManager
+from enum import IntEnum
+from os.path import abspath, join 
+
 from .merlin_drivers import MERLIN_connection
+
 
 class Merlin(AbstractContextManager):
 
@@ -8,7 +12,7 @@ class Merlin(AbstractContextManager):
     Wrapper around the MERLIN_connection API.
 
     This API can be used as a context manager:
-    >>> with MerlinAPI(...) as merlin:
+    >>> with Merlin(...) as merlin:
     ...     pass
 
     Parameters
@@ -18,13 +22,26 @@ class Merlin(AbstractContextManager):
     ipaddress : str, optional
         (Local) IP address of the Merlin Quad server.
     """
-    def __init__(self, hostname = 'diamrd', ipaddress = '000'):
+    class DetectorStatus(IntEnum):
+        idle    = 0
+        busy    = 1
+        standby = 2
+
+    def __init__(self, hostname = 'diamrd', ipaddress = '169.254.165.189'):
         self._cmd_api  = MERLIN_connection(hostname, ipaddress, channel = 'cmd')
-        #self._data_api = MERLIN_connection(hostname, ipaddress, channel = 'data')
+        self._data_api = MERLIN_connection(hostname, ipaddress, channel = 'data')
+
+        # Settings most relevant to Siwick Lab
+        self._cmd_api.setValue('HVBIAS', 120)               # Never forget to set the bias
+        self._cmd_api.setValue('TRIGGERSTART', 1)           # Starts on rising edge TTL
+        self._cmd_api.setValue('TRIGGERSTOP', 2)            # Stops on TTL falling edge
+        self._cmd_api.setValue('NUMFRAMESPERTRIGGER', 1)    # Only acquire one image per trigger
+        self._cmd_api.setValue('CHARGESUMMING', 0)          # Charge summing mode off
+        self._cmd_api.setValue('FILEENABLE', 1)
     
     def __exit__(self, *args, **kwargs):
         self._cmd_api.sock.close()
-        #self._data_api.sock.close()
+        self._data_api.sock.close()
         super().__exit__(*args, **kwargs)
     
     @property
@@ -33,27 +50,95 @@ class Merlin(AbstractContextManager):
         return self._cmd_api.getFloatNumericVariable('TEMPERATURE')
     
     @property
+    def detector_status(self):
+        """ Returns the detector status {'idle', 'busy', 'standby'} """
+        status = self._cmd_api.getIntNumericVariable('DETECTORSTATUS')
+        return str(self.DetectorStatus(status))
+    
+    @property
     def hv_bias(self):
         """ High-voltage sensor bias """
-        return self._cmd_api.getFloatNumericVariable('HVBIAS')
+        return float(self._cmd_api.getFloatNumericVariable('HVBIAS'))
 
     @property
-    def acquisition_time(self):
-        """ Image acquisition time """
-        return self._cmd_api.getFloatNumericVariable('ACQUISITIONTIME')
-
+    def exposure(self):
+        """ Exposure time in seconds """
+        ms = self._cmd_api.getFloatNumericVariable('ACQUISITIONTIME')
+        return float(ms)/1000
+    
     @property
-    def numframes(self):
-        """ Number of images to acquire on next start """
-        return self._cmd_api.getIntNumericVariable('NUMFRAMESTOACQUIRE')
+    def acquisition_period(self):
+        """ Time of acquisition, which may be multi-frames """
+        ms = self._cmd_api.getFloatNumericVariable('ACQUISITIONPERIOD')
+        return float(ms)/1000
 
-    def trigger_start(self):
-        """ Trigger an acquisition. Acquisition will start at the next
-        trigger pulse. """
-        self._cmd_api.setValue('TRIGGERSTART', 1)
+    def set_folder(self, path):
+        """ 
+        Change folder in which pictures are saved.
+        
+        Parameters
+        ----------
+        path : str
+        """
+        path = abspath(path)
+        return self._cmd_api.setValue('FILEDIRECTORY', path)
     
-    def trigger_stop(self):
-        """ Stop an acquisition on the next trigger """
-        self._cmd_api.setValue('TRIGGERSTOP', 0)
-    
+    def set_filename(self, path):
+        """ 
+        Change filename in which pictures are saved.
+        
+        Parameters
+        ----------
+        path : str
+        """
+        return self._cmd_api.setValue('FILENAME', path)
 
+    def set_bit_depth(self, depth):
+        """ 
+        Set the detector bit depth
+
+        Parameters
+        ----------
+        depth : int, {1, 6, 12, 24}
+            Bit depth.
+        """
+        depth = int(depth)
+        assert depth in {1, 6, 12, 24}
+        self._cmd_api.setValue('COUNTERDEPTH', depth)
+
+    def set_num_frames(self, num):
+        """
+        Set the number of frames to take on every acquisition.
+
+        Parameters
+        ----------
+        num : int
+            Number of frames (1 - 100 000)
+        """
+        num = int(num)
+        return self._cmd_api.setValue('NUMFRAMESTOACQUIRE', num)
+    
+    def set_continuous_mode(self, mode):
+        """
+        Turn continuous mode ON or OFF.
+
+        Parameters
+        ----------
+        mode : bool
+        """
+        mode = int(mode)
+        self._cmd_api.setValue('CONTINUOUSRW', mode)
+    
+    def start_acquisition(self, exposure = None):
+        """
+        Acquire an image, starting at the next trigger.
+
+        Parameters
+        ----------
+        exposure : float or None, optional
+            Exposure time in seconds.
+        """
+        if exposure:
+            exp_ms = round(exposure * 1000)
+            self._cmd_api.setValue('ACQUISITIONTIME', exp_ms) 
+        return self._cmd_api.startAcq()
