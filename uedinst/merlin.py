@@ -2,6 +2,7 @@
 from contextlib import AbstractContextManager
 from enum import IntEnum
 from os.path import abspath, join 
+from time import sleep
 
 from .merlin_drivers import MERLIN_connection
 
@@ -26,22 +27,23 @@ class Merlin(AbstractContextManager):
         idle    = 0
         busy    = 1
         standby = 2
+        armed   = 4
 
     def __init__(self, hostname = 'diamrd', ipaddress = '169.254.165.189'):
         self._cmd_api  = MERLIN_connection(hostname, ipaddress, channel = 'cmd')
-        self._data_api = MERLIN_connection(hostname, ipaddress, channel = 'data')
 
         # Settings most relevant to Siwick Lab
         self._cmd_api.setValue('HVBIAS', 120)               # Never forget to set the bias
+        self._cmd_api.setValue('THRESHOLD0', 20)
+        self._cmd_api.setValue('THRESHOLD1', 511)
         self._cmd_api.setValue('TRIGGERSTART', 1)           # Starts on rising edge TTL
-        self._cmd_api.setValue('TRIGGERSTOP', 2)            # Stops on TTL falling edge
+        self._cmd_api.setValue('TRIGGERSTOP', 0)            # Stops on internal trigger
         self._cmd_api.setValue('NUMFRAMESPERTRIGGER', 1)    # Only acquire one image per trigger
         self._cmd_api.setValue('CHARGESUMMING', 0)          # Charge summing mode off
         self._cmd_api.setValue('FILEENABLE', 1)
     
     def __exit__(self, *args, **kwargs):
         self._cmd_api.sock.close()
-        self._data_api.sock.close()
         super().__exit__(*args, **kwargs)
     
     @property
@@ -53,7 +55,7 @@ class Merlin(AbstractContextManager):
     def detector_status(self):
         """ Returns the detector status {'idle', 'busy', 'standby'} """
         status = self._cmd_api.getIntNumericVariable('DETECTORSTATUS')
-        return str(self.DetectorStatus(status))
+        return self.DetectorStatus(status)
     
     @property
     def hv_bias(self):
@@ -118,6 +120,18 @@ class Merlin(AbstractContextManager):
         num = int(num)
         return self._cmd_api.setValue('NUMFRAMESTOACQUIRE', num)
     
+    def set_frames_per_trigger(self, num):
+        """
+        Set the number of frames to take on every trigger.
+
+        Parameters
+        ----------
+        num : int
+            Number of frames (1 - 100 000)
+        """
+        num = int(num)
+        return self._cmd_api.setValue('NUMFRAMESPERTRIGGER', num)
+    
     def set_continuous_mode(self, mode):
         """
         Turn continuous mode ON or OFF.
@@ -129,16 +143,23 @@ class Merlin(AbstractContextManager):
         mode = int(mode)
         self._cmd_api.setValue('CONTINUOUSRW', mode)
     
-    def start_acquisition(self, exposure = None):
+    def start_acquisition(self, exposure, period = 1e-3):
         """
-        Acquire an image, starting at the next trigger.
+        Acquire an image, starting at the next trigger. 
 
         Parameters
         ----------
-        exposure : float or None, optional
+        exposure : float
             Exposure time in seconds.
+        period : float, optional
+            Time between consecutive shots in seconds. Default
+            is acquisition at 1 kHz.
         """
-        if exposure:
-            exp_ms = round(exposure * 1000)
-            self._cmd_api.setValue('ACQUISITIONTIME', exp_ms) 
-        return self._cmd_api.startAcq()
+        exp_ms = exposure * 1000
+        period_ms = period*1000
+        self._cmd_api.setValue('ACQUISITIONTIME', exp_ms) 
+        self._cmd_api.setValue('ACQUISITIONPERIOD', period_ms)
+        self._cmd_api.startAcq()
+
+        while self.detector_status != self.DetectorStatus.idle:
+            sleep(0.5)

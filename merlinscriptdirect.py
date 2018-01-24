@@ -1,17 +1,18 @@
 
 import sys
-from datetime import datetime
-from os.path import basename, join
-from time import sleep
-import sys
+from os.path import join
+
+from npstreams import linspace
 from tqdm import tqdm
 
 from uedinst import ILS250PP, Merlin, SC10Shutter
 
-TIME_POINTS         = [-50, -25, 0, 25, 50, 100]
-EXPERIMENT_TAG      = 'test'
+TIME_POINTS         = list(linspace(-50, 25, 20))
+EXPERIMENT_TAG      = 'tzero-hunt-coppergrid-4'
+EXPOSURE            = 400e-6        # 400 microseconds per shot
+NSCANS              = 500
 FOLDER              = join('D:\\Data', EXPERIMENT_TAG)
-TIME_ZERO_POSITION  = -32.0189
+TIME_ZERO_POSITION  = -68.1823
 
 def diff(iterable):
     """ 
@@ -29,45 +30,46 @@ def diff(iterable):
 
 if __name__ == '__main__':
 
-
     with Merlin() as merlin:
         merlin.set_folder(FOLDER)
         merlin.set_bit_depth(6)
-        merlin.set_num_frames(100)
-        merlin.set_continuous_mode(True)
-
-        acquisition_period = 3 # merlin.acquisition_period
-
+        merlin.set_num_frames(NSCANS)
+        merlin.set_frames_per_trigger(1)
+        merlin.set_continuous_mode(False)
 
         with SC10Shutter('COM11') as probe_shutter:
             
             probe_shutter.set_operating_mode(probe_shutter.OperatingModes.manual)
             probe_shutter.enable(False)
 
-            merlin.set_filename('probe_off.mib')
-            merlin.start_acquisition()
-            sleep(acquisition_period + 0.5)
+            with SC10Shutter('COM13') as pump_shutter:
+                pump_shutter.set_operating_mode(pump_shutter.OperatingModes.manual)
+                
+                # Start with 'laser' background, i.e. probe off and pump on
+                pump_shutter.enable(True)
+                merlin.set_folder(join(FOLDER, 'probe_off'))
+                merlin.set_filename('probe_off.mib')
+                merlin.start_acquisition(EXPOSURE, period = 1e-3)
 
-            probe_shutter.enable(True)
+                probe_shutter.enable(True)
 
-        with SC10Shutter('COM13') as pump_shutter:
-            pump_shutter.set_operating_mode(pump_shutter.OperatingModes.manual)
-            pump_shutter.enable(False)
+                with ILS250PP() as delay_stage:
+                    delay_stage.absolute_move(TIME_ZERO_POSITION)
 
-            with ILS250PP() as delay_stage:
-                delay_stage.absolute_move(TIME_ZERO_POSITION)
+                    for time_delta, time in tqdm(zip(diff(TIME_POINTS), TIME_POINTS), total = len(TIME_POINTS)):
 
-                for time_delta, time in tqdm(zip(diff(TIME_POINTS), TIME_POINTS), total = len(TIME_POINTS)):
+                        # Save all time-points pictures in a new folder
+                        new_folder = join(FOLDER, '{:.3f}'.format(time))
+                        merlin.set_folder(join(FOLDER, '{:.3f}'.format(time)))
 
-                    delay_stage.relative_time_shift(time_delta)
-                    pump_shutter.enable(True)
+                        delay_stage.relative_time_shift(time_delta)
+                        pump_shutter.enable(True)
 
-                    merlin.set_filename('pumpon_{:.3f}ps.mib'.format(time))
-                    merlin.start_acquisition()
-                    sleep(acquisition_period + 0.5)
+                        merlin.set_filename('pumpon_{:.3f}ps_.mib'.format(time))
+                        merlin.start_acquisition(EXPOSURE, period = 1e-3)
 
-                    pump_shutter.enable(False)
+                        # No need for pumpoff pictures
+                        # pump_shutter.enable(False)
 
-                    merlin.set_filename('pumpoff_{:.3f}ps.mib'.format(time))
-                    merlin.start_acquisition()
-                    sleep(acquisition_period + 0.5)
+                        # merlin.set_filename('pumpoff_{:.3f}ps_.mib'.format(time))
+                        # merlin.start_acquisition(EXPOSURE, period = 1e-3)
