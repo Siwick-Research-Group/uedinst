@@ -43,6 +43,7 @@ class Merlin(AbstractContextManager):
         self._cmd_api.setValue('FILEENABLE', 1)
     
     def __exit__(self, *args, **kwargs):
+        self._cmd_api.setValue('FILEENABLE', 0)
         self._cmd_api.sock.close()
         super().__exit__(*args, **kwargs)
     
