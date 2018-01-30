@@ -9,18 +9,17 @@ from tqdm import trange
 from uedinst import ILS250PP, Merlin, SC10Shutter
 from faraday import FaradayClient
 
-TIME_POINTS         = list(linspace(-80, 199, num = 35))
-EXPERIMENT_TAG      = 'chromium-tzero-hunt-longexp'
-EXPOSURE            = 3
-NSCANS              = 120
+TIME_POINTS         = list(linspace(-110, 1200, num = 200))
+EXPERIMENT_TAG      = 'chromium-tzero-hunt-fullstage'
+EXPOSURE            = 10
+NSCANS              = 100
 FOLDER              = join('D:\\Data', EXPERIMENT_TAG)
-
 
 if __name__ == '__main__':
 
     with Merlin() as merlin:
         merlin.set_folder(FOLDER)
-        merlin.set_bit_depth(24)
+        merlin.set_bit_depth(12)
         merlin.set_num_frames(1)
         merlin.set_frames_per_trigger(1)
         merlin.set_continuous_mode(False)
@@ -48,8 +47,10 @@ if __name__ == '__main__':
                     
                     instruments.delay_abs_time(time)
 
-                    new_folder = join(FOLDER, '{:.3f}'.format(time))
                     merlin.set_folder(join(FOLDER, '{:.3f}'.format(time)))
                     merlin.set_filename('pumpon_{:.3f}ps_{}.mib'.format(time, scan))
 
                     merlin.start_acquisition(EXPOSURE, period = EXPOSURE + 0.01)
+            
+            instruments.pump_shutter_enable(False)
+            instruments.probe_shutter_enable(False)
