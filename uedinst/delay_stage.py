@@ -111,15 +111,22 @@ class DelayStage(AbstractContextManager):
         of ``delay`` picoseconds """
         # Distance to move is half because of back-and-forth motion
         # along the stage
+
+        # Increasing distance means the laser pulse arrives later;
+        # since the electron pulse arrives at fixed times
+        # this means that increasing distance -> earlier probing
         move_meters = (delay / 1e12) * (c_air / 2)
-        return move_meters * 1e3
+        return -1*move_meters * 1e3
     
     @staticmethod
     def distance_to_delay(dist):
         """ Calculate the extra time [ps] it takes for light to make a round-trip
         if the stage moves by ``dist`` millimeters. """
+        # Increasing distance means the laser pulse arrives later;
+        # since the electron pulse arrives at fixed times
+        # this means that increasing distance -> earlier probing
         extra_path = 2 * float(dist) / 1e3  # extra path [meters]
-        return (extra_path / c_air) * 1e12  # [picoseconds]
+        return -1*(extra_path / c_air) * 1e12  # [picoseconds]
 
     def disconnect(self):
         """ Disconnect from the XPS """
@@ -197,7 +204,7 @@ class DelayStage(AbstractContextManager):
 
     def relative_time_shift(self, shift):
         """
-        Move the delay stage to achieve a certain time-shift. This
+        Move the delay stage to achieve a certain relative time-shift. This
         function returns when move is completed.
 
         Parameters
@@ -207,6 +214,21 @@ class DelayStage(AbstractContextManager):
         """
         shift = float(shift)
         return self.relative_move(self.delay_to_distance(shift))
+    
+    def absolute_time(self, time, tzero_position = 0.0):
+        """
+        Move the delay stage to achieve a time-shift with respect
+        to a position for time-zero. This function returns when move is completed.
+
+        Parameters
+        ----------
+        time : float
+            Desired absolute time-shift in picoseconds
+        tzero_position : float, optional
+            Time-zero position in millimeters.
+        """
+        time, tzero_position = float(time), float(tzero_position)
+        return self.absolute_move(self.delay_to_distance(time) + tzero_position)
 
 class ILS250PP(DelayStage):
     """

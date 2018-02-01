@@ -44,7 +44,7 @@ class TestILS250PP(unittest.TestCase):
         # Expected distance for 30 ps
         # recall that the stage moving by x means that the
         # path length changes by 2x
-        expected = (30e-12) * 3e8 / 2 * 1e3 # ~ 4.5 mm
+        expected = -1*(30e-12) * 3e8 / 2 * 1e3 # ~ 4.5 mm
         
         with ILS250PP() as delay_stage:
             delay_stage.absolute_move(0.0)
@@ -52,6 +52,24 @@ class TestILS250PP(unittest.TestCase):
             new_pos = delay_stage.current_position()
         
         self.assertAlmostEqual(new_pos, expected, places = 2)
+    
+    def test_absolute_time_shift(self):
+        
+        with ILS250PP() as delay_stage:
+
+            with self.subTest('Absolute time -> time-zero'):
+                delay_stage.absolute_move(20.0)
+                delay_stage.absolute_time(0.0, tzero_position = 20.0)
+                self.assertAlmostEqual(delay_stage.current_position(), 20.0, places = 2)
+            
+            with self.subTest('Testing movement direction'):
+                # For ealier time-delay, stage should move further
+                delay_stage.absolute_move(15)
+                start_pos = delay_stage.current_position()
+                delay_stage.absolute_time(-10, tzero_position = 15)
+                stop_pos = delay_stage.current_position()
+                self.assertTrue(start_pos < stop_pos)
+
     
     def test_static_methods(self):
         """ Test that the delay_to_distance() and distance_to_delay() methods are inverse of each other """

@@ -4,14 +4,19 @@ from os.path import join
 
 from random import sample
 from npstreams import linspace
+import numpy as np
 from tqdm import trange
 
 from uedinst import ILS250PP, Merlin, SC10Shutter
 from faraday import FaradayClient
 
-TIME_POINTS         = list(linspace(-110, 1200, num = 200))
-EXPERIMENT_TAG      = 'chromium-tzero-hunt-fullstage'
-EXPOSURE            = 10
+# TIME_POINTS         = np.concatenate((np.arange(-10, -2, step = 1), 
+#                                       np.arange(-2, 15, step = 0.25), 
+#                                       np.arange(15, 50, step = 1),
+#                                       np.arange(50, 325, step = 25)), axis = 0).tolist()
+TIME_POINTS         = list(linspace(-100, 100, num = 100, endpoint = False))
+EXPERIMENT_TAG      = 'graphite-again-25mj'
+EXPOSURE            = 3
 NSCANS              = 100
 FOLDER              = join('D:\\Data', EXPERIMENT_TAG)
 
