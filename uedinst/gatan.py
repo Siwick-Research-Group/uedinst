@@ -76,7 +76,7 @@ class GatanUltrascan895(AbstractContextManager):
         """
         exposure = float(exposure)
         filename = str(filename)
-        if (not filename.endswith(('.tif', '.tiff')):
+        if (not filename.endswith(('.tif', '.tiff'))):
             filename = filename + '.tif'
         
         self.send_command("ULTRASCAN:ACQUIRE:{:.3f},{}".format(exposure, filename))
