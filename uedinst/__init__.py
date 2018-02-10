@@ -11,6 +11,7 @@ class InstrumentException(Exception):
 from .base import GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
 from .delay_stage import ILS250PP
 from .electrometer import Keithley6514
+from .gatan import GatanUltrascan895
 from .merlin import Merlin
 from .powermeter import TekPSM4120
 from .pressure import KLSeries979

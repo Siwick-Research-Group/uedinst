@@ -2,6 +2,8 @@
 import socket
 from contextlib import AbstractContextManager, suppress
 
+from . import InstrumentException
+
 class GatanUltrascan895(AbstractContextManager):
     """
     Interface to the Gatan Ultrascan 895 camera server.
@@ -31,14 +33,14 @@ class GatanUltrascan895(AbstractContextManager):
         
         Raises
         ------
-        RuntimeError : if answer received indicates an error occurred.
+        InstrumentException : if answer received indicates an error occurred.
         """
         total_command = ''.join(commands)
         self._socket.send(total_command.encode('utf-8'))
         answer = self._socket.recv(10).decode('utf-8')
 
-        if answer != 'OK':
-            raise RuntimeError('Command failed: {}. \n Answer received: {}'.format(total_command, answer))
+        if answer == "ERR":
+            raise InstrumentException('Command failed: {}. \n Answer received: {}'.format(total_command, answer))
         
         return answer
 
@@ -50,6 +52,31 @@ class GatanUltrascan895(AbstractContextManager):
         ----------
         toggle : bool
             If True, the camera will insert; otherwise, the camera will uninsert.
+
+        Raises
+        ------
+        InstrumentException : if answer received indicates an error occurred.
         """
         toggle = str(toggle).upper()
         self.send_command('ULTRASCAN:INSERT:', toggle)
+    
+    def acquire_image(self, exposure, filename):
+        """ Acquire an image and save it to disk. 
+        
+        Parameters
+        ----------
+        exposure : float
+            Exposure time in seconds.
+        filename : str or path-like
+            Filename of the image.
+
+        Raises
+        ------
+        InstrumentException : if answer received indicates an error occurred.
+        """
+        exposure = float(exposure)
+        filename = str(filename)
+        if (not filename.endswith(('.tif', '.tiff')):
+            filename = filename + '.tif'
+        
+        self.send_command("ULTRASCAN:ACQUIRE:{:.3f},{}".format(exposure, filename))
