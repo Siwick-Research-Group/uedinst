@@ -8,8 +8,8 @@ if __name__ == '__main__':
 
     with GatanUltrascan895() as camera:
         camera.insert(True)
-        im = camera.acquire_image(1.0, antiblooming = True)
-        print(im.dtype)
+        im = camera.acquire_image(3)
+        
         plt.figure()
         plt.imshow(im)
         plt.show()
