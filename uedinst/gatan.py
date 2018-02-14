@@ -86,8 +86,7 @@ class GatanUltrascan895(AbstractContextManager):
         exposure = float(exposure)
         antiblooming = str(antiblooming).upper()
         # Use a temporary file so that there can never be any conflits
-        # between subsequent acquisitions. The resulting image is read before
-        # the file is deleted.
+        # between subsequent acquisitions. The resulting image is read before the file is deleted.
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         temp_filename = join(gettempdir(), "_uedinst_temp.tif")
