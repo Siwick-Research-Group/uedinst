@@ -7,7 +7,7 @@ from os.path import join
 from tempfile import gettempdir
 
 import numpy as np
-from tifffile import imread
+from skimage.io import imread
 
 from . import InstrumentException
 
