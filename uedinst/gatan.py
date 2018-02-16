@@ -5,9 +5,10 @@ from contextlib import AbstractContextManager
 from os import remove
 from os.path import join
 from tempfile import gettempdir
+from time import sleep
 
 import numpy as np
-from skimage.io import imread
+from libtiff import TiffArray
 
 from . import InstrumentException
 
@@ -33,7 +34,7 @@ class GatanUltrascan895(AbstractContextManager):
         self._socket.close()
         super().__exit__(*args, **kwargs)
     
-    def send_command(self, *commands):
+    def send_command(self, *commands, wait = 0):
         """
         Send commands to the camera server. This method only returns
         once an answer has been received.
@@ -44,6 +45,7 @@ class GatanUltrascan895(AbstractContextManager):
         """
         total_command = ''.join(commands)
         self._socket.send(total_command.encode('ascii'))
+        sleep(wait)
         answer = self._socket.recv(10).decode('ascii')
 
         if answer == "ERR":
@@ -91,7 +93,7 @@ class GatanUltrascan895(AbstractContextManager):
         temp_filename = join(gettempdir(), "_uedinst_temp.tif")
         self.acquire_image_to_file(temp_filename, exposure)
         image = imread(temp_filename)
-        return image.mean(axis = 2)
+        return image[:,:,0] # For some reason, images are read as color images
     
     def acquire_image_to_file(self, filename, exposure):
         """ 
@@ -114,4 +116,4 @@ class GatanUltrascan895(AbstractContextManager):
         """
         exposure = float(exposure)
         filename = str(filename)
-        self.send_command("ULTRASCAN;ACQUIRE;{:.3f},{}".format(exposure, filename))
+        self.send_command("ULTRASCAN;ACQUIRE;{:.3f},{}".format(exposure, filename), wait = exposure)
