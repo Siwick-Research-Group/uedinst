@@ -8,7 +8,7 @@ from tempfile import gettempdir
 from time import sleep
 
 import numpy as np
-from libtiff import TiffArray
+from skimage.io import imread
 
 from . import InstrumentException
 
