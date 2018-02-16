@@ -1,16 +1,14 @@
 
-from enum import IntEnum
 import socket
 from contextlib import AbstractContextManager
-from os import remove
 from os.path import join
 from tempfile import gettempdir
 from time import sleep
 
-import numpy as np
 from skimage.io import imread
 
 from . import InstrumentException
+
 
 class GatanUltrascan895(AbstractContextManager):
     """
@@ -21,6 +19,7 @@ class GatanUltrascan895(AbstractContextManager):
     addr : str, optional
         IP address. Default is localhost.
     port : int, optional
+        IP port.
     """
 
     def __init__(self, addr = "127.0.0.1", port = 42057, **kwargs):

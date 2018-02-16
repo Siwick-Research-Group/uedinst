@@ -2,7 +2,7 @@
 __author__ = 'Laurent P. René de Cotret'
 __email__ = 'laurent.renedecotret@mail.mcgill.ca'
 __license__ = 'BSD'
-__version__ = '0.5.0'
+__version__ = '1.0.0'
 
 class InstrumentException(Exception):
 	""" Base exception for instrument-related errors. """

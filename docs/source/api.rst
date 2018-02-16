@@ -12,6 +12,16 @@ Reference/API
 Instrument Classes
 ==================
 
+.. autoclass:: GatanUltrascan895
+    :members:
+    :show-inheritance:
+    :member-order:
+
+.. autoclass:: Merlin
+    :members:
+    :show-inheritance:
+    :member-order:
+    
 .. autoclass:: SC10Shutter
     :members:
     :show-inheritance:
@@ -38,6 +48,11 @@ Instrument Classes
     :member-order:
 
 .. autoclass:: ILS250PP
+    :members:
+    :show-inheritance:
+    :member-order:
+
+.. autoclass:: RacalDana1991
     :members:
     :show-inheritance:
     :member-order:
