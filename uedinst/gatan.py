@@ -7,10 +7,10 @@ from time import sleep
 
 from skimage.io import imread
 
-from . import InstrumentException
+from . import TCPBase
 
 
-class GatanUltrascan895(AbstractContextManager):
+class GatanUltrascan895(TCPBase):
     """
     Interface to the Gatan Ultrascan 895 camera server.
 
@@ -21,17 +21,11 @@ class GatanUltrascan895(AbstractContextManager):
     port : int, optional
         IP port.
     """
-
-    def __init__(self, addr = "127.0.0.1", port = 42057, **kwargs):
-        self._socket = socket.socket()
+    def __init__(self, *args, **kwargs):
         try:
-            self._socket.connect((addr, port))
-        except ConnectionRefusedError:
-            raise InstrumentException('Could not connect to Digital Micrograph. Make sure it is open.')
-    
-    def __exit__(self, *args, **kwargs):
-        self._socket.close()
-        super().__exit__(*args, **kwargs)
+            super().__init__('127.0.0.1', 42057)
+        except InstrumentException:
+            raise InstrumentException('Could not connect to DigitalMicrograph. Make sure it is open.')
     
     def send_command(self, *commands, wait = 0):
         """
@@ -43,9 +37,9 @@ class GatanUltrascan895(AbstractContextManager):
         InstrumentException : if answer received indicates an error occurred.
         """
         total_command = ''.join(commands)
-        self._socket.send(total_command.encode('ascii'))
+        self.socket.send(total_command.encode('ascii'))
         sleep(wait)
-        answer = self._socket.recv(10).decode('ascii')
+        answer = self.socket.recv(10).decode('ascii')
 
         if answer == "ERR":
             raise InstrumentException('Command failed: {}. \n Answer received: {}'.format(total_command, answer))

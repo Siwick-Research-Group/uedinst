@@ -8,7 +8,7 @@ class InstrumentException(Exception):
 	""" Base exception for instrument-related errors. """
 	pass
 
-from .base 			import (GPIBBase, SerialBase, RS485Base, 
+from .base 			import (TCPBase, GPIBBase, SerialBase, RS485Base, 
 							MetaInstrument, Singleton)
 from .delay_stage 	import ILS250PP
 from .electrometer 	import Keithley6514

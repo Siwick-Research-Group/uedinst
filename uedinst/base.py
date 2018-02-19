@@ -1,7 +1,9 @@
 
 from abc import ABCMeta
+from contextlib import AbstractContextManager
 from functools import wraps
 from types import FunctionType
+from socket import socket
 
 from pyvisa import ResourceManager
 from pyvisa.errors import VisaIOError
@@ -47,6 +49,27 @@ class Singleton(ABCMeta):
         if cls not in cls._instances:
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
+
+class TCPBase(AbstractContextManager, metaclass = MetaInstrument):
+    """
+    Base class for an instrument that interfaces through TCP/IP.
+    Instances have a ``socket`` attribute.
+
+    Parameters
+    ----------
+    addr : str
+        IP address, e.g. '127.0.0.1'
+    port : int
+        IP port.
+    """
+    def __init__(self, addr, port, *args, **kwargs):
+        self.socket = socket()
+        self.socket.connect((addr, port))
+        super().__init__(*args, **kwargs)
+
+    def __exit__(self, *exc):
+        self.socket.close()
+        super().__exit__(*exc)
 
 class GPIBBase(metaclass = MetaInstrument):
     """ 
