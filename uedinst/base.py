@@ -68,8 +68,11 @@ class TCPBase(AbstractContextManager, metaclass = MetaInstrument):
         super().__init__(*args, **kwargs)
 
     def __exit__(self, *exc):
-        self.socket.close()
+        self.close()
         super().__exit__(*exc)
+    
+    def close(self):
+        return self.socket.close()
 
 class GPIBBase(metaclass = MetaInstrument):
     """ 
