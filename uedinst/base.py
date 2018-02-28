@@ -1,15 +1,15 @@
 
-from abc import ABCMeta
+from abc        import ABCMeta
 from contextlib import AbstractContextManager
-from functools import wraps
-from types import FunctionType
-from socket import socket
+from functools  import wraps
+from socket     import socket
+from types      import FunctionType
 
-from pyvisa import ResourceManager
-from pyvisa.errors import VisaIOError
-from pyvisa.resources import GPIBInstrument
-from serial import Serial, SerialException
-from serial.rs485 import RS485
+from pyvisa             import ResourceManager
+from pyvisa.errors      import VisaIOError
+from pyvisa.resources   import GPIBInstrument
+from serial             import Serial, SerialException
+from serial.rs485       import RS485
 
 from . import InstrumentException
 
@@ -74,7 +74,7 @@ class TCPBase(AbstractContextManager, metaclass = MetaInstrument):
     def close(self):
         return self.socket.close()
 
-class GPIBBase(metaclass = MetaInstrument):
+class GPIBBase(AbstractContextManager, metaclass = MetaInstrument):
     """ 
     Base class for GPIB instruments. It wraps PyVisa's ResourceManager with open resources.
     ``GPIBBase`` also supports context managemenent (``with`` statement).
@@ -91,10 +91,15 @@ class GPIBBase(metaclass = MetaInstrument):
         self._rm = ResourceManager()
         self._instrument = self._rm.open_resource(resource_name = addr, **kwargs)
 
-    def __enter__(self):
-        return self
-    
     def __exit__(self, *exc):
+        self.clear()
+        self.close()
+        super().__exit__(*exc)
+    
+    def clear(self):
+        return self._instrument.clear()
+    
+    def close(self):
         self._instrument.close()
         self._rm.close()
 

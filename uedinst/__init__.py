@@ -19,4 +19,5 @@ from .powermeter 	import TekPSM4120
 from .pressure 		import KLSeries979
 from .psupply 		import HeinzingerPNChp
 from .shutter 		import SC10Shutter
+from .temperature   import ITC503
 from .utils 		import is_valid_IP, timeout
