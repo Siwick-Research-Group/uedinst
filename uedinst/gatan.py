@@ -1,11 +1,7 @@
 
-import socket
-from contextlib import AbstractContextManager
 from os.path import join
 from tempfile import gettempdir
 from time import sleep
-
-from skimage.io import imread
 
 import numpy as np
 from . import TCPBase, InstrumentException
