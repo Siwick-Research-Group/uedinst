@@ -16,8 +16,7 @@ class TestITC503(unittest.TestCase):
         self.temp_controller = ITC503()
 
     def tearDown(self):
-        self.temp_controller._instrument.close()
-        del self.temp_controller
+        self.temp_controller.close()
 
     def test_state(self):
         for state in ITC503.ControlState:

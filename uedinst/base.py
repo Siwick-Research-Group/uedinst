@@ -92,7 +92,6 @@ class GPIBBase(AbstractContextManager, metaclass = MetaInstrument):
         self._instrument = self._rm.open_resource(resource_name = addr, **kwargs)
 
     def __exit__(self, *exc):
-        self.clear()
         self.close()
         super().__exit__(*exc)
     

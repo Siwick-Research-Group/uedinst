@@ -57,6 +57,11 @@ Instrument Classes
     :show-inheritance:
     :member-order:
 
+.. autoclass:: ITC503
+    :members:
+    :show-inheritance:
+    :member-order:
+
 ============
 Base Classes
 ============
