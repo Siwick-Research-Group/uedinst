@@ -19,6 +19,12 @@ class ITC503(GPIBBase):
         RemoteLocked   = 1
         LocalUnlocked  = 2
         RemoteUnlocked = 3
+    
+    class HeatAndFlowMode(IntEnum):
+        AllManual             = 0
+        HeaterAutoGasManual   = 1
+        HeaterManualGasAuto   = 2
+        AllAuto               = 3
 
     def __init__(self, **kwargs):
         kwargs.update({'read_termination' : '\r',
@@ -65,14 +71,16 @@ class ITC503(GPIBBase):
         return self.ControlState(int(status[5]))
     
     @property
+    def heater_and_gas_flow(self):
+        """ State of heater and gas flow control """
+        status = self.query('X') # = 'X0A0C0S00H1L0'
+        return self.HeatAndFlowMode(int(status[3]))
+    
+    @property
     def temperature(self):
         """ Instantaneous temperature of sensor 1 in Kelvin """
         message = self.query('R1')
-        try:
-            return float(message[1:])
-        except:
-            self.clear()
-            raise InstrumentException('Invalid response: {}'.format(message))
+        return float(message[1:])
     
     @property
     def temperature_setpoint(self):
