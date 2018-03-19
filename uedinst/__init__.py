@@ -8,6 +8,10 @@ class InstrumentException(Exception):
 	""" Base exception for instrument-related errors. """
 	pass
 
+class InstrumentWarning(UserWarning):
+	""" Base warning for instrument-related warnings. """
+	pass
+
 from .base 			import (TCPBase, GPIBBase, SerialBase, RS485Base, 
 							MetaInstrument, Singleton)
 from .delay_stage 	import ILS250PP

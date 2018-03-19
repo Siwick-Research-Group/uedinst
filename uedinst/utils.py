@@ -1,8 +1,13 @@
 
 from contextlib import contextmanager
-from threading import Timer, Event
+from functools import wraps
+from socket import error, inet_aton
+from threading import Event, Timer
+
 from _thread import interrupt_main  # lower-level module than ``threading``
-from socket import inet_aton, error
+
+from warnings import warn
+from . import InstrumentWarning
 
 def is_valid_IP(addr):
     """ Returns True if ``addr`` is a valid IPv4, False otherwise. """
@@ -12,6 +17,24 @@ def is_valid_IP(addr):
         return False
     else:
         return True
+
+def clear_on_error(f):
+    """ Decorator that clears the instrument when f(self, *args, **kwargs) raises an exception.
+    Only the first exception is caught. The instrument (self) must implement ``self.clear()``.
+    
+    In case of a caught exception a warning of type ``uedinst.InstrumentWarning`` is thrown. """
+    
+    @wraps(f)
+    def method(self, *args, **kwargs):
+        try:
+            return f(self, *args, **kwargs)
+        except Exception as e:
+            warn(message = 'An error was caught and suppressed: {}'.format(e), 
+                 category = InstrumentWarning)
+            self.clear()
+            return f(self, *args, **kwargs)
+    
+    return method
 
 @contextmanager
 def timeout(seconds, exception, exc_message = ''):

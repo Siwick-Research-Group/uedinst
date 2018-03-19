@@ -1,6 +1,6 @@
 
 from .base import SerialBase
-from .utils import timeout
+from .utils import clear_on_error
 from enum import IntEnum
 
 class SC10Shutter(SerialBase):
@@ -34,9 +34,7 @@ class SC10Shutter(SerialBase):
 					   'baudrate': 9600, 
 					   'timeout':  2.0})
 		super().__init__(**kwargs)
-		self.read_all()
-		self.set_trigger_mode(self.TriggerModes.external)
-		self.set_operating_mode(self.OperatingModes.gated)
+		self.clear()
 
 	@property
 	def enabled(self):
@@ -105,6 +103,7 @@ class SC10Shutter(SerialBase):
 			raw = raw.replace(char, '')
 		return raw
 
+	@clear_on_error	
 	def enable(self, en):
 		"""
 		Enable/disable shutter.
@@ -124,6 +123,7 @@ class SC10Shutter(SerialBase):
 			# we query for 'ens', not only write.
 			self.query_str('ens')
 
+	@clear_on_error
 	def set_trigger_mode(self, mode):
 		"""
 		Change trigger mode. Depending on the operating mdoe, this function may have no
@@ -148,6 +148,7 @@ class SC10Shutter(SerialBase):
 			raise ValueError('Trigger mode must be one of {}, not {}'.format(list(self.TriggerModes), mode))
 		self.query_str('trig={}'.format(int_mode))
 
+	@clear_on_error
 	def set_operating_mode(self, mode):
 		"""
 		Set operating mode.
@@ -171,6 +172,7 @@ class SC10Shutter(SerialBase):
 			raise ValueError('Operating mode must be one of {}, not {}'.format(list(self.OperatingModes), mode))
 		self.query_str('mode={}'.format(int_mode))
 
+	@clear_on_error
 	def set_open_time(self, ms):
 		"""
 		Set shutter open time
@@ -182,6 +184,7 @@ class SC10Shutter(SerialBase):
 		"""
 		self.query_str('open={}'.format(int(ms)))
 
+	@clear_on_error
 	def set_repeat_count(self, count):
 		"""
 		Set repeat count in 'repeat' operating mode.

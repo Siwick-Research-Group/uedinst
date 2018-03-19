@@ -92,6 +92,7 @@ class GPIBBase(AbstractContextManager, metaclass = MetaInstrument):
         self._instrument = self._rm.open_resource(resource_name = addr, **kwargs)
 
     def __exit__(self, *exc):
+        self.clear()
         self.close()
         super().__exit__(*exc)
     
@@ -139,7 +140,15 @@ class SerialBase(Serial, metaclass = MetaInstrument):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Clear buffer which might not be empty due to errors
+        self.clear()
+    
+    def __exit__(self, *exc):
+        self.clear()
+        self.close()
+        super().__exit__(*exc)
+    
+    def clear(self):
+        """ Clear buffers which might not be empty due to errors """
         self.reset_input_buffer()
         self.reset_output_buffer()
 
