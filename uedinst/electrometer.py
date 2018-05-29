@@ -36,7 +36,7 @@ class Keithley6514(GPIBBase):
         # self.wait_for_srq() always times out
         self.write('STAT:PRES')                 # Reset all event lines
         self.write('STAT:MEAS:ENAB 512')
-
+        self.write('VOLT:NPLC 0.01')
     
     def __exit__(self, *exc):
         error_codes = self.error_codes()
@@ -92,6 +92,7 @@ class Keithley6514(GPIBBase):
         if trig not in {'IMM', 'TLIN'}:
             raise ValueError('Trigger source must be either IMM or TLIN, not {}'.format(trig))
         self.write('TRIG:SOUR {}'.format(trig))
+        self.write('TRIG:TCON:ASYN:ILIN {}'.format(trig))
     
     def set_input_trigger_line(self, line):
         """
@@ -120,8 +121,9 @@ class Keithley6514(GPIBBase):
                              "RES", or "CHAR", and {} is not one of them')
         
         self.write('CONF:{}'.format(func))
+        self.write('{}:NPLC 0.01'.format(func))
     
-    def acquire_buffered(self, num, timeout = None):
+    def acquire_buffered(self, num, timeout = None, nplc = 0.01):
         """
         Acquire ``num`` buffered readings. 
 
@@ -132,6 +134,9 @@ class Keithley6514(GPIBBase):
         timeout : int or None, optional
             Timeout of the operation in milliseconds. 
             If None (default), timeout is disabled.
+        nplc : float, [0.01 - 10]
+            Integration time in number of power-line cycles (NPLC).
+            For reference, nplc = 6 -> 16.67ms of integration time.
         
         Returns
         -------
@@ -142,6 +147,7 @@ class Keithley6514(GPIBBase):
         Raises
         ------
         ValueError: if ``num`` is too large (> 2500)
+        ValueError: if ``nplc`` is out-of-bounds
         InstrumentException: if buffer didn't fill up before timeout expired
 
         Notes
@@ -152,14 +158,23 @@ class Keithley6514(GPIBBase):
         if num > 2500:
             raise ValueError('Cannot store more than 2500 readings in the buffer.')
 
+        nplc = float(nplc)
+        if (nplc < 0.01) or (nplc > 10):
+            raise ValueError('Cannot integrate for {:.2f} NPLCs. Choose a value in [0.01, 10]')
+        
+        self.write('VOLT:NPLC {:.2f}'.format(nplc))
         self.write('TRIG:COUN {}'.format(num))
 
         self.write('*SRE 9')                    # Lookout for buffer full
-
+        
         self.write('TRAC:CLE')                  # Clear buffer
         self.write('TRAC:POIN {}'.format(num))  # Set number of buffer points
         self.write('TRAC:FEED SENS1')           # Store raw measurements
         self.write('TRAC:FEED:CONT NEXT')       # Start buffered acquisition
+        
+        self.toggle_autozero(False)
+        self.toggle_zero_check(False)
+        self.toggle_display(False)
         self.write('INIT')                      # Bring electrometer out of idle state
 
         # Prepare some things while data acquisition
@@ -173,8 +188,14 @@ class Keithley6514(GPIBBase):
         self.write('*CLS')
 
         data = self.query('TRAC:DATA?').split(',')
+        
         arr[:,0] = to_arr(data[1::2])   # time
         arr[:,1] = to_arr(data[0::2])   # readings
+
+        self.toggle_display(True)
+        self.toggle_zero_check(True)
+        self.toggle_display(True)
+
         return arr
     
     def toggle_display(self, toggle):
