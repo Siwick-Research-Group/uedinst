@@ -5,7 +5,7 @@ from warnings import warn
 
 import serial
 
-from . import GPIBBase, InstrumentException, SerialBase, TCPBase
+from . import GPIBBase, SerialBase, TCPBase, InstrumentException
 
 
 class OphirRFAmplifierMixin(ABC):
@@ -98,7 +98,7 @@ class OphirRFAmplifierTCP(TCPBase, OphirRFAmplifierMixin):
         super().__init__(addr = ip, port = port, **kwargs)
     
     def write(self, message):
-        self.socket.write(message)
+        return self.socket.write(message)
     
     def read(self):
         return self.socket.recv()
