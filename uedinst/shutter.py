@@ -35,6 +35,10 @@ class SC10Shutter(SerialBase):
 					   'timeout':  2.0})
 		super().__init__(**kwargs)
 		self.clear()
+	
+	def close(self):
+		self.clear()
+		super().close()
 
 	@property
 	def enabled(self):
