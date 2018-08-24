@@ -4,12 +4,14 @@ from enum import IntEnum, unique
 from time import sleep
 
 from scipy.constants import speed_of_light as c_vacuum
-air_refractive_index = 1.0003
-c_air = c_vacuum / air_refractive_index    # meters per second
 
 from .base import InstrumentException
 from .utils import is_valid_IP, timeout
 from .XPS_C8_drivers import XPS
+
+air_refractive_index = 1.0003
+c_air = c_vacuum / air_refractive_index    # meters per second
+
 
 @unique
 class XPSQ8Errors(IntEnum):
@@ -233,7 +235,7 @@ class DelayStage(AbstractContextManager):
 class ILS250PP(DelayStage):
     """
     Interface to an ILS250PP delay-stage connected
-    to a Newport XPS Q8 positioner.
+    to a Newport XPS C8 positioner.
     """
 
     group = 'GROUP5'

@@ -1,22 +1,23 @@
 
-from os.path import join
+from pathlib import Path
 from tempfile import gettempdir
 from time import sleep
 
 import numpy as np
-from . import TCPBase, InstrumentException
+
+from . import InstrumentException, TCPBase
+
+TEMPDIR = Path(gettempdir())
+INT16INFO = np.iinfo(np.int16)
 
 class GatanUltrascan895(TCPBase):
     """
     Interface to the Gatan Ultrascan 895 camera server.
 
-    Parameters
-    ----------
-    addr : str, optional
-        IP address. Default is localhost.
-    port : int, optional
-        IP port.
+    The IP address is fixed to 127.0.0.1:42057.
     """
+    temp_image_fname =  str(TEMPDIR / "_uedinst_temp.dat")
+
     def __init__(self, *args, **kwargs):
         try:
             super().__init__('127.0.0.1', 42057)
@@ -34,11 +35,12 @@ class GatanUltrascan895(TCPBase):
         """
         total_command = ''.join(commands)
         self.socket.send(total_command.encode('ascii'))
-        sleep(wait)
+        if wait:
+            sleep(wait)
         answer = self.socket.recv(10).decode('ascii')
 
         if answer == "ERR":
-            raise InstrumentException('Command failed: {}. \n Answer received: {}'.format(total_command, answer))
+            raise InstrumentException('Command failed: {}.\nAnswer received: {}'.format(total_command, answer))
         
         return answer
 
@@ -49,7 +51,7 @@ class GatanUltrascan895(TCPBase):
         Parameters
         ----------
         toggle : bool
-            If True, the camera will insert; otherwise, the camera will uninsert.
+            If True, the camera will insert; otherwise, the camera will retract.
 
         Raises
         ------
@@ -81,18 +83,15 @@ class GatanUltrascan895(TCPBase):
         # between subsequent acquisitions.
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
-        temp_filename = join(gettempdir(), "_uedinst_temp.dat")
-        self.send_command("ULTRASCAN;ACQUIRE;{:.3f},{}".format(exposure, temp_filename), wait = exposure)
+        self.send_command("ULTRASCAN;ACQUIRE;{:.3f},{}".format(exposure, self.temp_image_fname), wait = exposure)
 
         # We save the images as raw format
         # because the 'translation' to TIFF was buggy
         # Therefore, better to get to the raw data and cast ourselves.
-        with open(temp_filename, mode = 'rb') as datafile:
+        with open(self.temp_image_fname, mode = 'rb') as datafile:
             arr = np.fromfile(datafile, dtype = np.int32).reshape((2048, 2048))
         
         # Gatan Ultrascan 895 can't actually detect higher than ~30 000 counts
-        # Therefore, we can safely cast as int16 
-        # First, clipping to minimum/maximum int16 is done 
-        int16info = np.iinfo(np.int16)
-        np.clip(arr, int16info.min, int16info.max, out = arr)
+        # Therefore, we can safely cast as int16 (after clipping)
+        np.clip(arr, INT16INFO.min, INT16INFO.max, out = arr)
         return arr.astype(np.int16)
