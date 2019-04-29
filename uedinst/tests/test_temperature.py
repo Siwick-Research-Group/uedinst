@@ -1,4 +1,3 @@
-
 import unittest
 from contextlib import suppress
 
@@ -9,9 +8,9 @@ with suppress(InstrumentException):
     ITC503()
     HAS_ITC503 = True
 
-@unittest.skipIf(not HAS_ITC503, 'ITC503 temperature controller not connected.')
+
+@unittest.skipIf(not HAS_ITC503, "ITC503 temperature controller not connected.")
 class TestITC503(unittest.TestCase):
-    
     def setUp(self):
         self.temp_controller = ITC503()
 
@@ -23,8 +22,9 @@ class TestITC503(unittest.TestCase):
 
             self.temp_controller.set_control(state)
             self.assertEqual(state, self.temp_controller.control_state)
-        
+
         self.temp_controller.set_control(ITC503.ControlState.RemoteUnlocked)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

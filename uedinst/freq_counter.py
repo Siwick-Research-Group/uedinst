@@ -1,5 +1,5 @@
-
 from . import GPIBBase
+
 
 class RacalDana1991(GPIBBase):
     """
@@ -22,12 +22,12 @@ class RacalDana1991(GPIBBase):
     """
 
     def __init__(self, addr, **kwargs):
-        kwargs['read_termination'] = '\r'
+        kwargs["read_termination"] = "\r"
         super().__init__(addr, **kwargs)
 
-        self.write('FA')
-        self.write('T0')
-    
+        self.write("FA")
+        self.write("T0")
+
     def frequency(self):
         """
         Return the frequency value.
@@ -37,4 +37,4 @@ class RacalDana1991(GPIBBase):
         frequency : float
         """
         raw = self.read()
-        return float(raw.replace('FA', ''))
+        return float(raw.replace("FA", ""))

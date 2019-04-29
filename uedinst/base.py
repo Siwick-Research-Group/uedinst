@@ -1,15 +1,14 @@
-
-from abc        import ABCMeta
+from abc import ABCMeta
 from contextlib import AbstractContextManager
-from functools  import wraps
-from socket     import socket
-from types      import FunctionType
+from functools import wraps
+from socket import socket
+from types import FunctionType
 
-from pyvisa             import ResourceManager
-from pyvisa.errors      import VisaIOError
-from pyvisa.resources   import GPIBInstrument
-from serial             import Serial, SerialException
-from serial.rs485       import RS485
+from pyvisa import ResourceManager
+from pyvisa.errors import VisaIOError
+from pyvisa.resources import GPIBInstrument
+from serial import Serial, SerialException
+from serial.rs485 import RS485
 
 from . import InstrumentException
 
@@ -20,7 +19,9 @@ def general_exception(func, *wrapped_exc):
             return func(*args, **kwargs)
         except (VisaIOError, SerialException):
             raise InstrumentException
+
     return new_func
+
 
 class MetaInstrument(ABCMeta):
     """
@@ -32,10 +33,11 @@ class MetaInstrument(ABCMeta):
         super().__init__(clsname, bases, clsdict)
 
         for name, value in clsdict.items():
-            if not isinstance(value, FunctionType): 
+            if not isinstance(value, FunctionType):
                 continue
             else:
                 setattr(self, name, general_exception(value))
+
 
 class Singleton(ABCMeta):
     """ 
@@ -50,7 +52,8 @@ class Singleton(ABCMeta):
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
-class TCPBase(AbstractContextManager, metaclass = MetaInstrument):
+
+class TCPBase(AbstractContextManager, metaclass=MetaInstrument):
     """
     Base class for an instrument that interfaces through TCP/IP.
     Instances have a ``socket`` attribute.
@@ -62,6 +65,7 @@ class TCPBase(AbstractContextManager, metaclass = MetaInstrument):
     port : int
         IP port.
     """
+
     def __init__(self, addr, port, *args, **kwargs):
         self.socket = socket()
         self.socket.connect((addr, port))
@@ -70,11 +74,12 @@ class TCPBase(AbstractContextManager, metaclass = MetaInstrument):
     def __exit__(self, *exc):
         self.close()
         super().__exit__(*exc)
-    
+
     def close(self):
         return self.socket.close()
 
-class GPIBBase(AbstractContextManager, metaclass = MetaInstrument):
+
+class GPIBBase(AbstractContextManager, metaclass=MetaInstrument):
     """ 
     Base class for GPIB instruments. It wraps PyVisa's ResourceManager with open resources.
     ``GPIBBase`` also supports context managemenent (``with`` statement).
@@ -89,34 +94,34 @@ class GPIBBase(AbstractContextManager, metaclass = MetaInstrument):
 
     def __init__(self, addr, **kwargs):
         self._rm = ResourceManager()
-        self._instrument = self._rm.open_resource(resource_name = addr, **kwargs)
+        self._instrument = self._rm.open_resource(resource_name=addr, **kwargs)
 
     def __exit__(self, *exc):
         self.clear()
         self.close()
         super().__exit__(*exc)
-    
+
     def clear(self):
         return self._instrument.clear()
-    
+
     def close(self):
         self._instrument.close()
         self._rm.close()
 
     def write(self, *args, **kwargs):
         return self._instrument.write(*args, **kwargs)
-    
+
     def read(self, *args, **kwargs):
         return self._instrument.read(*args, **kwargs)
-    
+
     def query(self, *args, **kwargs):
         return self._instrument.query(*args, **kwargs)
 
     write.__doc__ = GPIBInstrument.write.__doc__
-    read.__doc__  = GPIBInstrument.read.__doc__
+    read.__doc__ = GPIBInstrument.read.__doc__
     query.__doc__ = GPIBInstrument.query.__doc__
 
-    def wait_for_srq(self, timeout = 25000):
+    def wait_for_srq(self, timeout=25000):
         """
         Wait for a serial request (SRQ) or the timeout to expire.
 
@@ -132,21 +137,23 @@ class GPIBBase(AbstractContextManager, metaclass = MetaInstrument):
         """
         return self._instrument.wait_for_srq(timeout)
 
-class SerialBase(Serial, metaclass = MetaInstrument):
+
+class SerialBase(Serial, metaclass=MetaInstrument):
     """
     Base class for serial instruments.
     """
-    ENCODING = 'ascii'
+
+    ENCODING = "ascii"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.clear()
-    
+
     def __exit__(self, *exc):
         self.clear()
         self.close()
         super().__exit__(*exc)
-    
+
     def clear(self):
         """ Clear buffers which might not be empty due to errors """
         self.reset_input_buffer()
@@ -192,14 +199,16 @@ class SerialBase(Serial, metaclass = MetaInstrument):
         InstrumentException : incomplete write
         """
         returned = super().write(data.encode(self.ENCODING), *args, **kwargs)
-        self.flush()	# wait until all data is written
+        self.flush()  # wait until all data is written
         return returned
 
-class RS485Base(RS485, metaclass = MetaInstrument):
+
+class RS485Base(RS485, metaclass=MetaInstrument):
     """
     Base class for RS485 instruments.
     """
-    ENCODING = 'ascii'
+
+    ENCODING = "ascii"
 
     def read_str(self, *args, **kwargs):
         """
@@ -241,5 +250,5 @@ class RS485Base(RS485, metaclass = MetaInstrument):
         InstrumentException : incomplete write
         """
         returned = super().write(data.encode(self.ENCODING), *args, **kwargs)
-        self.flush()	# wait until all data is written
+        self.flush()  # wait until all data is written
         return returned

@@ -1,4 +1,3 @@
-
 import unittest
 from contextlib import suppress
 import numpy as np
@@ -11,12 +10,14 @@ with suppress(InstrumentException):
     CAMERA_AVAILABLE = True
     camera.close()
 
-@unittest.skipIf(not CAMERA_AVAILABLE, 'Gatan Ultrascan 895 camera not connected/available.')
-class TestGatanUltrascan895(unittest.TestCase):
 
+@unittest.skipIf(
+    not CAMERA_AVAILABLE, "Gatan Ultrascan 895 camera not connected/available."
+)
+class TestGatanUltrascan895(unittest.TestCase):
     def setUp(self):
         self.camera = GatanUltrascan895()
-    
+
     def tearDown(self):
         self.camera.close()
 
@@ -26,6 +27,7 @@ class TestGatanUltrascan895(unittest.TestCase):
 
         self.assertEqual(im.dtype, np.int16)
         self.assertTupleEqual(im.shape, (2048, 2048))
-        
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     unittest.main()

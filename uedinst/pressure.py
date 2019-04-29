@@ -2,6 +2,7 @@ import serial
 
 from . import RS485Base, InstrumentException
 
+
 class KLSeries979(RS485Base):
     """
     Interface to a Kurt Lesker 979 series vacuum transducer.
@@ -13,15 +14,18 @@ class KLSeries979(RS485Base):
     kwargs 
         Keyword-arguments are passed to RS485Base class.
     """
-    ENCODING = 'ascii'
+
+    ENCODING = "ascii"
 
     def __init__(self, port, **kwargs):
-        super().__init__(port = port, 
-                         baudrate = 9600, 
-                         parity = serial.PARITY_NONE, 
-                         stopbits = serial.STOPBITS_ONE,
-                         timeout = 1, 
-                         **kwargs)
+        super().__init__(
+            port=port,
+            baudrate=9600,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            timeout=1,
+            **kwargs
+        )
 
     def read_until(self, termination, **kwargs):
         """
@@ -35,30 +39,30 @@ class KLSeries979(RS485Base):
         -------
         data : str
         """
-        data = ''
+        data = ""
         while not data.endswith(termination):
             data += self.read_str()
         return data
-    
+
     @property
     def baud_rate(self):
         """ Current baud rate """
-        self.write('@254BR?;FF')
-        value = self.read_until(';FF')
+        self.write("@254BR?;FF")
+        value = self.read_until(";FF")
         return int(value[7:-3])
-    
+
     @property
     def degassing(self):
         """ True if transducer is currently degassing; False otherwise. """
-        self.write_str('@254DG?;FF')
-        response = self.read_until(';FF')
-        return (response == '@254ACKON;FF')
-    
+        self.write_str("@254DG?;FF")
+        response = self.read_until(";FF")
+        return response == "@254ACKON;FF"
+
     def identify(self):
         """ Flash filament power LED on and off to visually identify
         the unit. """
-        self.write_str('@001TST?;FF')
-    
+        self.write_str("@001TST?;FF")
+
     def degas(self):
         """ 
         Launch degassing procedure. Only possible if pressure
@@ -71,8 +75,8 @@ class KLSeries979(RS485Base):
         if curr_pres > 1e-5:
             raise InstrumentException
         else:
-            self.write_str('@254DG!ON;FF')
-            self.read_until(';FF')
+            self.write_str("@254DG!ON;FF")
+            self.read_until(";FF")
 
     def pressure(self):
         """ 
@@ -83,8 +87,8 @@ class KLSeries979(RS485Base):
         torr : float
             Instantaneous pressure in Torr 
         """
-        self.write_str('@254PR3?;FF')
-        value = self.read_until(';FF')
+        self.write_str("@254PR3?;FF")
+        value = self.read_until(";FF")
 
         # Return value will look like @001ACK1.23E-2;FF
         # Always starts with @xxxACK
