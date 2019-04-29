@@ -24,8 +24,7 @@ class XPS:
         for socketId in range(self.MAX_NB_SOCKETS):
             XPS.__usedSockets[socketId] = 0
 
-            # Send command and get return
-
+    # Send command and get return
     def __sendAndReceive(self, socketId, command, encoding="utf-8"):
         try:
             XPS.__sockets[socketId].send(command.encode(encoding))
@@ -42,8 +41,7 @@ class XPS:
             if ret[i] == ",":
                 return [int(ret[0:i]), ret[i + 1 : -9]]
 
-                # TCP_ConnectToServer
-
+    # TCP_ConnectToServer
     def TCP_ConnectToServer(self, IP, port, timeOut):
         socketId = 0
         if XPS.__nbSockets < self.MAX_NB_SOCKETS:
@@ -66,14 +64,12 @@ class XPS:
 
         return socketId
 
-        # TCP_SetTimeout
-
+    # TCP_SetTimeout
     def TCP_SetTimeout(self, socketId, timeOut):
         if XPS.__usedSockets[socketId] == 1:
             XPS.__sockets[socketId].settimeout(timeOut)
 
-            # TCP_CloseSocket
-
+    # TCP_CloseSocket
     def TCP_CloseSocket(self, socketId):
         if socketId >= 0 and socketId < self.MAX_NB_SOCKETS:
             try:
@@ -83,13 +79,11 @@ class XPS:
             except socket.error:
                 pass
 
-                # GetLibraryVersion
-
+    # GetLibraryVersion
     def GetLibraryVersion(self):
         return ["XPS-C8 Firmware V2.6.x Beta 19"]
 
-        # ControllerMotionKernelTimeLoadGet :  Get controller motion kernel time load
-
+    # ControllerMotionKernelTimeLoadGet :  Get controller motion kernel time load
     def ControllerMotionKernelTimeLoadGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -110,8 +104,7 @@ class XPS:
 
         return retList
 
-        # ControllerStatusGet :  Read controller current status
-
+    # ControllerStatusGet :  Read controller current status
     def ControllerStatusGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -128,8 +121,7 @@ class XPS:
 
         return retList
 
-        # ControllerStatusStringGet :  Return the controller status string corresponding to the controller status code
-
+    # ControllerStatusStringGet :  Return the controller status string corresponding to the controller status code
     def ControllerStatusStringGet(self, socketId, ControllerStatusCode):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -138,8 +130,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ElapsedTimeGet :  Return elapsed time from controller power on
-
+    # ElapsedTimeGet :  Return elapsed time from controller power on
     def ElapsedTimeGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -156,8 +147,7 @@ class XPS:
 
         return retList
 
-        # ErrorStringGet :  Return the error string corresponding to the error code
-
+    # ErrorStringGet :  Return the error string corresponding to the error code
     def ErrorStringGet(self, socketId, ErrorCode):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -166,8 +156,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # FirmwareVersionGet :  Return firmware version
-
+    # FirmwareVersionGet :  Return firmware version
     def FirmwareVersionGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -176,8 +165,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # TCLScriptExecute :  Execute a TCL script from a TCL file
-
+    # TCLScriptExecute :  Execute a TCL script from a TCL file
     def TCLScriptExecute(self, socketId, TCLFileName, TaskName, ParametersList):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -194,8 +182,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # TCLScriptExecuteAndWait :  Execute a TCL script from a TCL file and wait the end of execution to return
-
+    # TCLScriptExecuteAndWait :  Execute a TCL script from a TCL file and wait the end of execution to return
     def TCLScriptExecuteAndWait(
         self, socketId, TCLFileName, TaskName, InputParametersList
     ):
@@ -214,8 +201,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # TCLScriptExecuteWithPriority :  Execute a TCL script with defined priority
-
+    # TCLScriptExecuteWithPriority :  Execute a TCL script with defined priority
     def TCLScriptExecuteWithPriority(
         self, socketId, TCLFileName, TaskName, TaskPriorityLevel, ParametersList
     ):
@@ -236,8 +222,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # TCLScriptKill :  Kill TCL Task
-
+    # TCLScriptKill :  Kill TCL Task
     def TCLScriptKill(self, socketId, TaskName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -246,8 +231,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # TimerGet :  Get a timer
-
+    # TimerGet :  Get a timer
     def TimerGet(self, socketId, TimerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -264,8 +248,7 @@ class XPS:
 
         return retList
 
-        # TimerSet :  Set a timer
-
+    # TimerSet :  Set a timer
     def TimerSet(self, socketId, TimerName, FrequencyTicks):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -274,8 +257,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # Reboot :  Reboot the controller
-
+    # Reboot :  Reboot the controller
     def Reboot(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -284,8 +266,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # Login :  Log in
-
+    # Login :  Log in
     def Login(self, socketId, Name, Password):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -294,8 +275,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # CloseAllOtherSockets :  Close all socket beside the one used to send this command
-
+    # CloseAllOtherSockets :  Close all socket beside the one used to send this command
     def CloseAllOtherSockets(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -304,8 +284,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # HardwareDateAndTimeGet :  Return hardware date and time
-
+    # HardwareDateAndTimeGet :  Return hardware date and time
     def HardwareDateAndTimeGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -314,8 +293,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # HardwareDateAndTimeSet :  Set hardware date and time
-
+    # HardwareDateAndTimeSet :  Set hardware date and time
     def HardwareDateAndTimeSet(self, socketId, DateAndTime):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -324,8 +302,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventAdd :  ** OBSOLETE ** Add an event
-
+    # EventAdd :  ** OBSOLETE ** Add an event
     def EventAdd(
         self,
         socketId,
@@ -360,8 +337,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventGet :  ** OBSOLETE ** Read events and actions list
-
+    # EventGet :  ** OBSOLETE ** Read events and actions list
     def EventGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -370,8 +346,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventRemove :  ** OBSOLETE ** Delete an event
-
+    # EventRemove :  ** OBSOLETE ** Delete an event
     def EventRemove(self, socketId, PositionerName, EventName, EventParameter):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -388,8 +363,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventWait :  ** OBSOLETE ** Wait an event
-
+    # EventWait :  ** OBSOLETE ** Wait an event
     def EventWait(self, socketId, PositionerName, EventName, EventParameter):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -400,8 +374,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedConfigurationTriggerSet :  Configure one or several events
-
+    # EventExtendedConfigurationTriggerSet :  Configure one or several events
     def EventExtendedConfigurationTriggerSet(
         self,
         socketId,
@@ -434,8 +407,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedConfigurationTriggerGet :  Read the event configuration
-
+    # EventExtendedConfigurationTriggerGet :  Read the event configuration
     def EventExtendedConfigurationTriggerGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -444,8 +416,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedConfigurationActionSet :  Configure one or several actions
-
+    # EventExtendedConfigurationActionSet :  Configure one or several actions
     def EventExtendedConfigurationActionSet(
         self,
         socketId,
@@ -478,8 +449,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedConfigurationActionGet :  Read the action configuration
-
+    # EventExtendedConfigurationActionGet :  Read the action configuration
     def EventExtendedConfigurationActionGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -488,8 +458,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedStart :  Launch the last event and action configuration and return an ID
-
+    # EventExtendedStart :  Launch the last event and action configuration and return an ID
     def EventExtendedStart(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -506,8 +475,7 @@ class XPS:
 
         return retList
 
-        # EventExtendedAllGet :  Read all event and action configurations
-
+    # EventExtendedAllGet :  Read all event and action configurations
     def EventExtendedAllGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -516,8 +484,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedGet :  Read the event and action configuration defined by ID
-
+    # EventExtendedGet :  Read the event and action configuration defined by ID
     def EventExtendedGet(self, socketId, ID):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -526,8 +493,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedRemove :  Remove the event and action configuration defined by ID
-
+    # EventExtendedRemove :  Remove the event and action configuration defined by ID
     def EventExtendedRemove(self, socketId, ID):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -536,8 +502,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventExtendedWait :  Wait events from the last event configuration
-
+    # EventExtendedWait :  Wait events from the last event configuration
     def EventExtendedWait(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -546,8 +511,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringConfigurationGet : Read different mnemonique type
-
+    # GatheringConfigurationGet : Read different mnemonique type
     def GatheringConfigurationGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -556,8 +520,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringConfigurationSet :  Configuration acquisition
-
+    # GatheringConfigurationSet :  Configuration acquisition
     def GatheringConfigurationSet(self, socketId, Type):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -572,8 +535,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringCurrentNumberGet :  Maximum number of samples and current number during acquisition
-
+    # GatheringCurrentNumberGet :  Maximum number of samples and current number during acquisition
     def GatheringCurrentNumberGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -592,8 +554,7 @@ class XPS:
 
         return retList
 
-        # GatheringStopAndSave :  Stop acquisition and save data
-
+    # GatheringStopAndSave :  Stop acquisition and save data
     def GatheringStopAndSave(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -602,8 +563,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringDataAcquire :  Acquire a configured data
-
+    # GatheringDataAcquire :  Acquire a configured data
     def GatheringDataAcquire(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -612,8 +572,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringDataGet :  Get a data line from gathering buffer
-
+    # GatheringDataGet :  Get a data line from gathering buffer
     def GatheringDataGet(self, socketId, IndexPoint):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -622,8 +581,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringDataMultipleLinesGet :  Get multiple data lines from gathering buffer
-
+    # GatheringDataMultipleLinesGet :  Get multiple data lines from gathering buffer
     def GatheringDataMultipleLinesGet(self, socketId, IndexPoint, NumberOfLines):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -638,8 +596,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringReset :  Empty the gathered data in memory to start new gathering from scratch
-
+    # GatheringReset :  Empty the gathered data in memory to start new gathering from scratch
     def GatheringReset(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -648,8 +605,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringRun :  Start a new gathering
-
+    # GatheringRun :  Start a new gathering
     def GatheringRun(self, socketId, DataNumber, Divisor):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -658,8 +614,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringRunAppend :  Re-start the stopped gathering to add new data
-
+    # GatheringRunAppend :  Re-start the stopped gathering to add new data
     def GatheringRunAppend(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -668,8 +623,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringStop :  Stop the data gathering (without saving to file)
-
+    # GatheringStop :  Stop the data gathering (without saving to file)
     def GatheringStop(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -678,8 +632,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringExternalConfigurationSet :  Configuration acquisition
-
+    # GatheringExternalConfigurationSet :  Configuration acquisition
     def GatheringExternalConfigurationSet(self, socketId, Type):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -694,8 +647,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringExternalConfigurationGet :  Read different mnemonique type
-
+    # GatheringExternalConfigurationGet :  Read different mnemonique type
     def GatheringExternalConfigurationGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -704,8 +656,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringExternalCurrentNumberGet :  Maximum number of samples and current number during acquisition
-
+    # GatheringExternalCurrentNumberGet :  Maximum number of samples and current number during acquisition
     def GatheringExternalCurrentNumberGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -724,8 +675,7 @@ class XPS:
 
         return retList
 
-        # GatheringExternalDataGet :  Get a data line from external gathering buffer
-
+    # GatheringExternalDataGet :  Get a data line from external gathering buffer
     def GatheringExternalDataGet(self, socketId, IndexPoint):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -734,8 +684,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringExternalStopAndSave :  Stop acquisition and save data
-
+    # GatheringExternalStopAndSave :  Stop acquisition and save data
     def GatheringExternalStopAndSave(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -744,8 +693,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GlobalArrayGet :  Get global array value
-
+    # GlobalArrayGet :  Get global array value
     def GlobalArrayGet(self, socketId, Number):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -754,8 +702,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GlobalArraySet :  Set global array value
-
+    # GlobalArraySet :  Set global array value
     def GlobalArraySet(self, socketId, Number, ValueString):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -764,8 +711,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # DoubleGlobalArrayGet :  Get double global array value
-
+    # DoubleGlobalArrayGet :  Get double global array value
     def DoubleGlobalArrayGet(self, socketId, Number):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -782,8 +728,7 @@ class XPS:
 
         return retList
 
-        # DoubleGlobalArraySet :  Set double global array value
-
+    # DoubleGlobalArraySet :  Set double global array value
     def DoubleGlobalArraySet(self, socketId, Number, DoubleValue):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -792,8 +737,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GPIOAnalogGet :  Read analog input or analog output for one or few input
-
+    # GPIOAnalogGet :  Read analog input or analog output for one or few input
     def GPIOAnalogGet(self, socketId, GPIOName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -818,8 +762,7 @@ class XPS:
 
         return retList
 
-        # GPIOAnalogSet :  Set analog output for one or few output
-
+    # GPIOAnalogSet :  Set analog output for one or few output
     def GPIOAnalogSet(self, socketId, GPIOName, AnalogOutputValue):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -834,8 +777,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GPIOAnalogGainGet :  Read analog input gain (1, 2, 4 or 8) for one or few input
-
+    # GPIOAnalogGainGet :  Read analog input gain (1, 2, 4 or 8) for one or few input
     def GPIOAnalogGainGet(self, socketId, GPIOName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -860,8 +802,7 @@ class XPS:
 
         return retList
 
-        # GPIOAnalogGainSet :  Set analog input gain (1, 2, 4 or 8) for one or few input
-
+    # GPIOAnalogGainSet :  Set analog input gain (1, 2, 4 or 8) for one or few input
     def GPIOAnalogGainSet(self, socketId, GPIOName, AnalogInputGainValue):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -876,8 +817,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GPIODigitalGet :  Read digital output or digital input
-
+    # GPIODigitalGet :  Read digital output or digital input
     def GPIODigitalGet(self, socketId, GPIOName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -894,8 +834,7 @@ class XPS:
 
         return retList
 
-        # GPIODigitalSet :  Set Digital Output for one or few output TTL
-
+    # GPIODigitalSet :  Set Digital Output for one or few output TTL
     def GPIODigitalSet(self, socketId, GPIOName, Mask, DigitalOutputValue):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -912,8 +851,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupAccelerationSetpointGet :  Return setpoint accelerations
-
+    # GroupAccelerationSetpointGet :  Return setpoint accelerations
     def GroupAccelerationSetpointGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -938,8 +876,7 @@ class XPS:
 
         return retList
 
-        # GroupAnalogTrackingModeEnable :  Enable Analog Tracking mode on selected group
-
+    # GroupAnalogTrackingModeEnable :  Enable Analog Tracking mode on selected group
     def GroupAnalogTrackingModeEnable(self, socketId, GroupName, Type):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -948,8 +885,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupAnalogTrackingModeDisable :  Disable Analog Tracking mode on selected group
-
+    # GroupAnalogTrackingModeDisable :  Disable Analog Tracking mode on selected group
     def GroupAnalogTrackingModeDisable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -958,8 +894,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupCorrectorOutputGet :  Return corrector outputs
-
+    # GroupCorrectorOutputGet :  Return corrector outputs
     def GroupCorrectorOutputGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -984,8 +919,7 @@ class XPS:
 
         return retList
 
-        # GroupCurrentFollowingErrorGet :  Return current following errors
-
+    # GroupCurrentFollowingErrorGet :  Return current following errors
     def GroupCurrentFollowingErrorGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1010,8 +944,7 @@ class XPS:
 
         return retList
 
-        # GroupHomeSearch :  Start home search sequence
-
+    # GroupHomeSearch :  Start home search sequence
     def GroupHomeSearch(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1020,8 +953,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupHomeSearchAndRelativeMove :  Start home search sequence and execute a displacement
-
+    # GroupHomeSearchAndRelativeMove :  Start home search sequence and execute a displacement
     def GroupHomeSearchAndRelativeMove(self, socketId, GroupName, TargetDisplacement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1036,8 +968,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupInitialize :  Start the initialization
-
+    # GroupInitialize :  Start the initialization
     def GroupInitialize(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1046,8 +977,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupInitializeWithEncoderCalibration :  Start the initialization with encoder calibration
-
+    # GroupInitializeWithEncoderCalibration :  Start the initialization with encoder calibration
     def GroupInitializeWithEncoderCalibration(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1056,8 +986,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupJogParametersSet :  Modify Jog parameters on selected group and activate the continuous move
-
+    # GroupJogParametersSet :  Modify Jog parameters on selected group and activate the continuous move
     def GroupJogParametersSet(self, socketId, GroupName, Velocity, Acceleration):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1072,8 +1001,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupJogParametersGet :  Get Jog parameters on selected group
-
+    # GroupJogParametersGet :  Get Jog parameters on selected group
     def GroupJogParametersGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1098,8 +1026,7 @@ class XPS:
 
         return retList
 
-        # GroupJogCurrentGet :  Get Jog current on selected group
-
+    # GroupJogCurrentGet :  Get Jog current on selected group
     def GroupJogCurrentGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1124,8 +1051,7 @@ class XPS:
 
         return retList
 
-        # GroupJogModeEnable :  Enable Jog mode on selected group
-
+    # GroupJogModeEnable :  Enable Jog mode on selected group
     def GroupJogModeEnable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1134,8 +1060,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupJogModeDisable :  Disable Jog mode on selected group
-
+    # GroupJogModeDisable :  Disable Jog mode on selected group
     def GroupJogModeDisable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1144,8 +1069,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupKill :  Kill the group
-
+    # GroupKill :  Kill the group
     def GroupKill(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1154,8 +1078,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupMoveAbort :  Abort a move
-
+    # GroupMoveAbort :  Abort a move
     def GroupMoveAbort(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1164,8 +1087,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupMoveAbsolute :  Do an absolute move
-
+    # GroupMoveAbsolute :  Do an absolute move
     def GroupMoveAbsolute(self, socketId, GroupName, TargetPosition):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1180,8 +1102,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupMoveRelative :  Do a relative move
-
+    # GroupMoveRelative :  Do a relative move
     def GroupMoveRelative(self, socketId, GroupName, TargetDisplacement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1196,8 +1117,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupMotionDisable :  Set Motion disable on selected group
-
+    # GroupMotionDisable :  Set Motion disable on selected group
     def GroupMotionDisable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1206,8 +1126,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupMotionEnable :  Set Motion enable on selected group
-
+    # GroupMotionEnable :  Set Motion enable on selected group
     def GroupMotionEnable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1216,8 +1135,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupPositionCorrectedProfilerGet :  Return corrected profiler positions
-
+    # GroupPositionCorrectedProfilerGet :  Return corrected profiler positions
     def GroupPositionCorrectedProfilerGet(
         self, socketId, GroupName, PositionX, PositionY
     ):
@@ -1246,8 +1164,7 @@ class XPS:
 
         return retList
 
-        # GroupPositionCurrentGet :  Return current positions
-
+    # GroupPositionCurrentGet :  Return current positions
     def GroupPositionCurrentGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1272,8 +1189,7 @@ class XPS:
 
         return retList
 
-        # GroupPositionPCORawEncoderGet :  Return PCO raw encoder positions
-
+    # GroupPositionPCORawEncoderGet :  Return PCO raw encoder positions
     def GroupPositionPCORawEncoderGet(self, socketId, GroupName, PositionX, PositionY):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1300,8 +1216,7 @@ class XPS:
 
         return retList
 
-        # GroupPositionSetpointGet :  Return setpoint positions
-
+    # GroupPositionSetpointGet :  Return setpoint positions
     def GroupPositionSetpointGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1326,8 +1241,7 @@ class XPS:
 
         return retList
 
-        # GroupPositionTargetGet :  Return target positions
-
+    # GroupPositionTargetGet :  Return target positions
     def GroupPositionTargetGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1352,8 +1266,7 @@ class XPS:
 
         return retList
 
-        # GroupReferencingActionExecute :  Execute an action in referencing mode
-
+    # GroupReferencingActionExecute :  Execute an action in referencing mode
     def GroupReferencingActionExecute(
         self,
         socketId,
@@ -1379,8 +1292,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupReferencingStart :  Enter referencing mode
-
+    # GroupReferencingStart :  Enter referencing mode
     def GroupReferencingStart(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1389,8 +1301,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupReferencingStop :  Exit referencing mode
-
+    # GroupReferencingStop :  Exit referencing mode
     def GroupReferencingStop(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1399,8 +1310,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupStatusGet :  Return group status
-
+    # GroupStatusGet :  Return group status
     def GroupStatusGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1417,8 +1327,7 @@ class XPS:
 
         return retList
 
-        # GroupStatusStringGet :  Return the group status string corresponding to the group status code
-
+    # GroupStatusStringGet :  Return the group status string corresponding to the group status code
     def GroupStatusStringGet(self, socketId, GroupStatusCode):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1427,8 +1336,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupVelocityCurrentGet :  Return current velocities
-
+    # GroupVelocityCurrentGet :  Return current velocities
     def GroupVelocityCurrentGet(self, socketId, GroupName, nbElement):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1453,8 +1361,7 @@ class XPS:
 
         return retList
 
-        # KillAll :  Put all groups in 'Not initialized' state
-
+    # KillAll :  Put all groups in 'Not initialized' state
     def KillAll(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1463,8 +1370,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerAnalogTrackingPositionParametersGet :  Read dynamic parameters for one axe of a group for a future analog tracking position
-
+    # PositionerAnalogTrackingPositionParametersGet :  Read dynamic parameters for one axe of a group for a future analog tracking position
     def PositionerAnalogTrackingPositionParametersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1487,8 +1393,7 @@ class XPS:
 
         return retList
 
-        # PositionerAnalogTrackingPositionParametersSet :  Update dynamic parameters for one axe of a group for a future analog tracking position
-
+    # PositionerAnalogTrackingPositionParametersSet :  Update dynamic parameters for one axe of a group for a future analog tracking position
     def PositionerAnalogTrackingPositionParametersSet(
         self, socketId, PositionerName, GPIOName, Offset, Scale, Velocity, Acceleration
     ):
@@ -1513,8 +1418,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerAnalogTrackingVelocityParametersGet :  Read dynamic parameters for one axe of a group for a future analog tracking velocity
-
+    # PositionerAnalogTrackingVelocityParametersGet :  Read dynamic parameters for one axe of a group for a future analog tracking velocity
     def PositionerAnalogTrackingVelocityParametersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1537,8 +1441,7 @@ class XPS:
 
         return retList
 
-        # PositionerAnalogTrackingVelocityParametersSet :  Update dynamic parameters for one axe of a group for a future analog tracking velocity
-
+    # PositionerAnalogTrackingVelocityParametersSet :  Update dynamic parameters for one axe of a group for a future analog tracking velocity
     def PositionerAnalogTrackingVelocityParametersSet(
         self,
         socketId,
@@ -1576,8 +1479,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerBacklashGet :  Read backlash value and status
-
+    # PositionerBacklashGet :  Read backlash value and status
     def PositionerBacklashGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1596,8 +1498,7 @@ class XPS:
 
         return retList
 
-        # PositionerBacklashSet :  Set backlash value
-
+    # PositionerBacklashSet :  Set backlash value
     def PositionerBacklashSet(self, socketId, PositionerName, BacklashValue):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1608,8 +1509,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerBacklashEnable :  Enable the backlash
-
+    # PositionerBacklashEnable :  Enable the backlash
     def PositionerBacklashEnable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1618,8 +1518,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerBacklashDisable :  Disable the backlash
-
+    # PositionerBacklashDisable :  Disable the backlash
     def PositionerBacklashDisable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1628,8 +1527,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorNotchFiltersSet :  Update filters parameters
-
+    # PositionerCorrectorNotchFiltersSet :  Update filters parameters
     def PositionerCorrectorNotchFiltersSet(
         self,
         socketId,
@@ -1664,8 +1562,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorNotchFiltersGet :  Read filters parameters
-
+    # PositionerCorrectorNotchFiltersGet :  Read filters parameters
     def PositionerCorrectorNotchFiltersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1688,8 +1585,7 @@ class XPS:
 
         return retList
 
-        # PositionerCorrectorPIDFFAccelerationSet :  Update corrector parameters
-
+    # PositionerCorrectorPIDFFAccelerationSet :  Update corrector parameters
     def PositionerCorrectorPIDFFAccelerationSet(
         self,
         socketId,
@@ -1742,8 +1638,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorPIDFFAccelerationGet :  Read corrector parameters
-
+    # PositionerCorrectorPIDFFAccelerationGet :  Read corrector parameters
     def PositionerCorrectorPIDFFAccelerationGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1766,8 +1661,7 @@ class XPS:
 
         return retList
 
-        # PositionerCorrectorPIDFFVelocitySet :  Update corrector parameters
-
+    # PositionerCorrectorPIDFFVelocitySet :  Update corrector parameters
     def PositionerCorrectorPIDFFVelocitySet(
         self,
         socketId,
@@ -1820,8 +1714,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorPIDFFVelocityGet :  Read corrector parameters
-
+    # PositionerCorrectorPIDFFVelocityGet :  Read corrector parameters
     def PositionerCorrectorPIDFFVelocityGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1844,8 +1737,7 @@ class XPS:
 
         return retList
 
-        # PositionerCorrectorPIDDualFFVoltageSet :  Update corrector parameters
-
+    # PositionerCorrectorPIDDualFFVoltageSet :  Update corrector parameters
     def PositionerCorrectorPIDDualFFVoltageSet(
         self,
         socketId,
@@ -1904,8 +1796,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorPIDDualFFVoltageGet :  Read corrector parameters
-
+    # PositionerCorrectorPIDDualFFVoltageGet :  Read corrector parameters
     def PositionerCorrectorPIDDualFFVoltageGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1928,8 +1819,7 @@ class XPS:
 
         return retList
 
-        # PositionerCorrectorPIPositionSet :  Update corrector parameters
-
+    # PositionerCorrectorPIPositionSet :  Update corrector parameters
     def PositionerCorrectorPIPositionSet(
         self, socketId, PositionerName, ClosedLoopStatus, KP, KI, IntegrationTime
     ):
@@ -1952,8 +1842,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorPIPositionGet :  Read corrector parameters
-
+    # PositionerCorrectorPIPositionGet :  Read corrector parameters
     def PositionerCorrectorPIPositionGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1976,8 +1865,7 @@ class XPS:
 
         return retList
 
-        # PositionerCorrectorTypeGet :  Read corrector type
-
+    # PositionerCorrectorTypeGet :  Read corrector type
     def PositionerCorrectorTypeGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -1986,8 +1874,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCurrentVelocityAccelerationFiltersGet :  Get current velocity and acceleration cutoff frequencies
-
+    # PositionerCurrentVelocityAccelerationFiltersGet :  Get current velocity and acceleration cutoff frequencies
     def PositionerCurrentVelocityAccelerationFiltersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2010,8 +1897,7 @@ class XPS:
 
         return retList
 
-        # PositionerCurrentVelocityAccelerationFiltersSet :  Set current velocity and acceleration cutoff frequencies
-
+    # PositionerCurrentVelocityAccelerationFiltersSet :  Set current velocity and acceleration cutoff frequencies
     def PositionerCurrentVelocityAccelerationFiltersSet(
         self,
         socketId,
@@ -2034,8 +1920,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerDriverFiltersGet :  Get driver filters parameters
-
+    # PositionerDriverFiltersGet :  Get driver filters parameters
     def PositionerDriverFiltersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2058,8 +1943,7 @@ class XPS:
 
         return retList
 
-        # PositionerDriverFiltersSet :  Set driver filters parameters
-
+    # PositionerDriverFiltersSet :  Set driver filters parameters
     def PositionerDriverFiltersSet(
         self,
         socketId,
@@ -2091,8 +1975,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerDriverPositionOffsetsGet :  Get driver stage and gage position offset
-
+    # PositionerDriverPositionOffsetsGet :  Get driver stage and gage position offset
     def PositionerDriverPositionOffsetsGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2115,8 +1998,7 @@ class XPS:
 
         return retList
 
-        # PositionerDriverStatusGet :  Read positioner driver status
-
+    # PositionerDriverStatusGet :  Read positioner driver status
     def PositionerDriverStatusGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2133,8 +2015,7 @@ class XPS:
 
         return retList
 
-        # PositionerDriverStatusStringGet :  Return the positioner driver status string corresponding to the positioner error code
-
+    # PositionerDriverStatusStringGet :  Return the positioner driver status string corresponding to the positioner error code
     def PositionerDriverStatusStringGet(self, socketId, PositionerDriverStatus):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2147,8 +2028,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerEncoderAmplitudeValuesGet :  Read analog interpolated encoder amplitude values
-
+    # PositionerEncoderAmplitudeValuesGet :  Read analog interpolated encoder amplitude values
     def PositionerEncoderAmplitudeValuesGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2171,8 +2051,7 @@ class XPS:
 
         return retList
 
-        # PositionerEncoderCalibrationParametersGet :  Read analog interpolated encoder calibration parameters
-
+    # PositionerEncoderCalibrationParametersGet :  Read analog interpolated encoder calibration parameters
     def PositionerEncoderCalibrationParametersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2195,8 +2074,7 @@ class XPS:
 
         return retList
 
-        # PositionerErrorGet :  Read and clear positioner error code
-
+    # PositionerErrorGet :  Read and clear positioner error code
     def PositionerErrorGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2213,8 +2091,7 @@ class XPS:
 
         return retList
 
-        # PositionerErrorRead :  Read only positioner error code without clear it
-
+    # PositionerErrorRead :  Read only positioner error code without clear it
     def PositionerErrorRead(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2231,8 +2108,7 @@ class XPS:
 
         return retList
 
-        # PositionerErrorStringGet :  Return the positioner status string corresponding to the positioner error code
-
+    # PositionerErrorStringGet :  Return the positioner status string corresponding to the positioner error code
     def PositionerErrorStringGet(self, socketId, PositionerErrorCode):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2241,8 +2117,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerExcitationSignalGet :  Read disturbing signal parameters
-
+    # PositionerExcitationSignalGet :  Read disturbing signal parameters
     def PositionerExcitationSignalGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2265,8 +2140,7 @@ class XPS:
 
         return retList
 
-        # PositionerExcitationSignalSet :  Update disturbing signal parameters
-
+    # PositionerExcitationSignalSet :  Update disturbing signal parameters
     def PositionerExcitationSignalSet(
         self, socketId, PositionerName, Mode, Frequency, Amplitude, Time
     ):
@@ -2289,8 +2163,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerExternalLatchPositionGet :  Read external latch position
-
+    # PositionerExternalLatchPositionGet :  Read external latch position
     def PositionerExternalLatchPositionGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2307,8 +2180,7 @@ class XPS:
 
         return retList
 
-        # PositionerHardwareStatusGet :  Read positioner hardware status
-
+    # PositionerHardwareStatusGet :  Read positioner hardware status
     def PositionerHardwareStatusGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2325,8 +2197,7 @@ class XPS:
 
         return retList
 
-        # PositionerHardwareStatusStringGet :  Return the positioner hardware status string corresponding to the positioner error code
-
+    # PositionerHardwareStatusStringGet :  Return the positioner hardware status string corresponding to the positioner error code
     def PositionerHardwareStatusStringGet(self, socketId, PositionerHardwareStatus):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2339,8 +2210,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerHardInterpolatorFactorGet :  Get hard interpolator parameters
-
+    # PositionerHardInterpolatorFactorGet :  Get hard interpolator parameters
     def PositionerHardInterpolatorFactorGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2357,8 +2227,7 @@ class XPS:
 
         return retList
 
-        # PositionerHardInterpolatorFactorSet :  Set hard interpolator parameters
-
+    # PositionerHardInterpolatorFactorSet :  Set hard interpolator parameters
     def PositionerHardInterpolatorFactorSet(
         self, socketId, PositionerName, InterpolationFactor
     ):
@@ -2375,8 +2244,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerMaximumVelocityAndAccelerationGet :  Return maximum velocity and acceleration of the positioner
-
+    # PositionerMaximumVelocityAndAccelerationGet :  Return maximum velocity and acceleration of the positioner
     def PositionerMaximumVelocityAndAccelerationGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2399,8 +2267,7 @@ class XPS:
 
         return retList
 
-        # PositionerMotionDoneGet :  Read motion done parameters
-
+    # PositionerMotionDoneGet :  Read motion done parameters
     def PositionerMotionDoneGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2423,8 +2290,7 @@ class XPS:
 
         return retList
 
-        # PositionerMotionDoneSet :  Update motion done parameters
-
+    # PositionerMotionDoneSet :  Update motion done parameters
     def PositionerMotionDoneSet(
         self,
         socketId,
@@ -2456,8 +2322,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerPositionCompareAquadBAlwaysEnable :  Enable AquadB signal in always mode
-
+    # PositionerPositionCompareAquadBAlwaysEnable :  Enable AquadB signal in always mode
     def PositionerPositionCompareAquadBAlwaysEnable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2466,8 +2331,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerPositionCompareAquadBWindowedGet :  Read position compare AquadB windowed parameters
-
+    # PositionerPositionCompareAquadBWindowedGet :  Read position compare AquadB windowed parameters
     def PositionerPositionCompareAquadBWindowedGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2490,8 +2354,7 @@ class XPS:
 
         return retList
 
-        # PositionerPositionCompareAquadBWindowedSet :  Set position compare AquadB windowed parameters
-
+    # PositionerPositionCompareAquadBWindowedSet :  Set position compare AquadB windowed parameters
     def PositionerPositionCompareAquadBWindowedSet(
         self, socketId, PositionerName, MinimumPosition, MaximumPosition
     ):
@@ -2510,8 +2373,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerPositionCompareGet :  Read position compare parameters
-
+    # PositionerPositionCompareGet :  Read position compare parameters
     def PositionerPositionCompareGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2534,8 +2396,7 @@ class XPS:
 
         return retList
 
-        # PositionerPositionCompareSet :  Set position compare parameters
-
+    # PositionerPositionCompareSet :  Set position compare parameters
     def PositionerPositionCompareSet(
         self, socketId, PositionerName, MinimumPosition, MaximumPosition, PositionStep
     ):
@@ -2556,8 +2417,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerPositionCompareEnable :  Enable position compare
-
+    # PositionerPositionCompareEnable :  Enable position compare
     def PositionerPositionCompareEnable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2566,8 +2426,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerPositionCompareDisable :  Disable position compare
-
+    # PositionerPositionCompareDisable :  Disable position compare
     def PositionerPositionCompareDisable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2576,8 +2435,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerPositionComparePulseParametersGet :  Get position compare PCO pulse parameters
-
+    # PositionerPositionComparePulseParametersGet :  Get position compare PCO pulse parameters
     def PositionerPositionComparePulseParametersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2600,8 +2458,7 @@ class XPS:
 
         return retList
 
-        # PositionerPositionComparePulseParametersSet :  Set position compare PCO pulse parameters
-
+    # PositionerPositionComparePulseParametersSet :  Set position compare PCO pulse parameters
     def PositionerPositionComparePulseParametersSet(
         self, socketId, PositionerName, PCOPulseWidth, EncoderSettlingTime
     ):
@@ -2620,8 +2477,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerRawEncoderPositionGet :  Get the raw encoder position
-
+    # PositionerRawEncoderPositionGet :  Get the raw encoder position
     def PositionerRawEncoderPositionGet(
         self, socketId, PositionerName, UserEncoderPosition
     ):
@@ -2646,8 +2502,7 @@ class XPS:
 
         return retList
 
-        # PositionersEncoderIndexDifferenceGet :  Return the difference between index of primary axis and secondary axis (only after homesearch)
-
+    # PositionersEncoderIndexDifferenceGet :  Return the difference between index of primary axis and secondary axis (only after homesearch)
     def PositionersEncoderIndexDifferenceGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2666,8 +2521,7 @@ class XPS:
 
         return retList
 
-        # PositionerSGammaExactVelocityAjustedDisplacementGet :  Return adjusted displacement to get exact velocity
-
+    # PositionerSGammaExactVelocityAjustedDisplacementGet :  Return adjusted displacement to get exact velocity
     def PositionerSGammaExactVelocityAjustedDisplacementGet(
         self, socketId, PositionerName, DesiredDisplacement
     ):
@@ -2692,8 +2546,7 @@ class XPS:
 
         return retList
 
-        # PositionerSGammaParametersGet :  Read dynamic parameters for one axe of a group for a future displacement
-
+    # PositionerSGammaParametersGet :  Read dynamic parameters for one axe of a group for a future displacement
     def PositionerSGammaParametersGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2716,8 +2569,7 @@ class XPS:
 
         return retList
 
-        # PositionerSGammaParametersSet :  Update dynamic parameters for one axe of a group for a future displacement
-
+    # PositionerSGammaParametersSet :  Update dynamic parameters for one axe of a group for a future displacement
     def PositionerSGammaParametersSet(
         self,
         socketId,
@@ -2746,8 +2598,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerSGammaPreviousMotionTimesGet :  Read SettingTime and SettlingTime
-
+    # PositionerSGammaPreviousMotionTimesGet :  Read SettingTime and SettlingTime
     def PositionerSGammaPreviousMotionTimesGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2770,8 +2621,7 @@ class XPS:
 
         return retList
 
-        # PositionerStageParameterGet :  Return the stage parameter
-
+    # PositionerStageParameterGet :  Return the stage parameter
     def PositionerStageParameterGet(self, socketId, PositionerName, ParameterName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2786,8 +2636,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerStageParameterSet :  Save the stage parameter
-
+    # PositionerStageParameterSet :  Save the stage parameter
     def PositionerStageParameterSet(
         self, socketId, PositionerName, ParameterName, ParameterValue
     ):
@@ -2806,8 +2655,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerTimeFlasherGet :  Read time flasher parameters
-
+    # PositionerTimeFlasherGet :  Read time flasher parameters
     def PositionerTimeFlasherGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2830,8 +2678,7 @@ class XPS:
 
         return retList
 
-        # PositionerTimeFlasherSet :  Set time flasher parameters
-
+    # PositionerTimeFlasherSet :  Set time flasher parameters
     def PositionerTimeFlasherSet(
         self, socketId, PositionerName, MinimumPosition, MaximumPosition, TimeInterval
     ):
@@ -2852,8 +2699,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerTimeFlasherEnable :  Enable time flasher
-
+    # PositionerTimeFlasherEnable :  Enable time flasher
     def PositionerTimeFlasherEnable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2862,8 +2708,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerTimeFlasherDisable :  Disable time flasher
-
+    # PositionerTimeFlasherDisable :  Disable time flasher
     def PositionerTimeFlasherDisable(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2872,8 +2717,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerUserTravelLimitsGet :  Read UserMinimumTarget and UserMaximumTarget
-
+    # PositionerUserTravelLimitsGet :  Read UserMinimumTarget and UserMaximumTarget
     def PositionerUserTravelLimitsGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2894,8 +2738,7 @@ class XPS:
 
         return retList
 
-        # PositionerUserTravelLimitsSet :  Update UserMinimumTarget and UserMaximumTarget
-
+    # PositionerUserTravelLimitsSet :  Update UserMinimumTarget and UserMaximumTarget
     def PositionerUserTravelLimitsSet(
         self, socketId, PositionerName, UserMinimumTarget, UserMaximumTarget
     ):
@@ -2914,8 +2757,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerDACOffsetGet :  Get DAC offsets
-
+    # PositionerDACOffsetGet :  Get DAC offsets
     def PositionerDACOffsetGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2934,8 +2776,7 @@ class XPS:
 
         return retList
 
-        # PositionerDACOffsetSet :  Set DAC offsets
-
+    # PositionerDACOffsetSet :  Set DAC offsets
     def PositionerDACOffsetSet(self, socketId, PositionerName, DACOffset1, DACOffset2):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2952,8 +2793,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerDACOffsetDualGet :  Get dual DAC offsets
-
+    # PositionerDACOffsetDualGet :  Get dual DAC offsets
     def PositionerDACOffsetDualGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -2976,8 +2816,7 @@ class XPS:
 
         return retList
 
-        # PositionerDACOffsetDualSet :  Set dual DAC offsets
-
+    # PositionerDACOffsetDualSet :  Set dual DAC offsets
     def PositionerDACOffsetDualSet(
         self,
         socketId,
@@ -3006,8 +2845,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerCorrectorAutoTuning :  Astrom&Hagglund based auto-tuning
-
+    # PositionerCorrectorAutoTuning :  Astrom&Hagglund based auto-tuning
     def PositionerCorrectorAutoTuning(self, socketId, PositionerName, TuningMode):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3032,8 +2870,7 @@ class XPS:
 
         return retList
 
-        # PositionerAccelerationAutoScaling :  Astrom&Hagglund based auto-scaling
-
+    # PositionerAccelerationAutoScaling :  Astrom&Hagglund based auto-scaling
     def PositionerAccelerationAutoScaling(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3050,8 +2887,7 @@ class XPS:
 
         return retList
 
-        # MultipleAxesPVTVerification :  Multiple axes PVT trajectory verification
-
+    # MultipleAxesPVTVerification :  Multiple axes PVT trajectory verification
     def MultipleAxesPVTVerification(self, socketId, GroupName, TrajectoryFileName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3062,8 +2898,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # MultipleAxesPVTVerificationResultGet :  Multiple axes PVT trajectory verification result get
-
+    # MultipleAxesPVTVerificationResultGet :  Multiple axes PVT trajectory verification result get
     def MultipleAxesPVTVerificationResultGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3086,8 +2921,7 @@ class XPS:
 
         return retList
 
-        # MultipleAxesPVTExecution :  Multiple axes PVT trajectory execution
-
+    # MultipleAxesPVTExecution :  Multiple axes PVT trajectory execution
     def MultipleAxesPVTExecution(
         self, socketId, GroupName, TrajectoryFileName, ExecutionNumber
     ):
@@ -3106,8 +2940,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # MultipleAxesPVTParametersGet :  Multiple axes PVT trajectory get parameters
-
+    # MultipleAxesPVTParametersGet :  Multiple axes PVT trajectory get parameters
     def MultipleAxesPVTParametersGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3124,8 +2957,7 @@ class XPS:
 
         return retList
 
-        # MultipleAxesPVTPulseOutputSet :  Configure pulse output on trajectory
-
+    # MultipleAxesPVTPulseOutputSet :  Configure pulse output on trajectory
     def MultipleAxesPVTPulseOutputSet(
         self, socketId, GroupName, StartElement, EndElement, TimeInterval
     ):
@@ -3146,8 +2978,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # MultipleAxesPVTPulseOutputGet :  Get pulse output on trajectory configuration
-
+    # MultipleAxesPVTPulseOutputGet :  Get pulse output on trajectory configuration
     def MultipleAxesPVTPulseOutputGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3168,8 +2999,7 @@ class XPS:
 
         return retList
 
-        # SingleAxisSlaveModeEnable :  Enable the slave mode
-
+    # SingleAxisSlaveModeEnable :  Enable the slave mode
     def SingleAxisSlaveModeEnable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3178,8 +3008,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SingleAxisSlaveModeDisable :  Disable the slave mode
-
+    # SingleAxisSlaveModeDisable :  Disable the slave mode
     def SingleAxisSlaveModeDisable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3188,8 +3017,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SingleAxisSlaveParametersSet :  Set slave parameters
-
+    # SingleAxisSlaveParametersSet :  Set slave parameters
     def SingleAxisSlaveParametersSet(self, socketId, GroupName, PositionerName, Ratio):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3206,8 +3034,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SingleAxisSlaveParametersGet :  Get slave parameters
-
+    # SingleAxisSlaveParametersGet :  Get slave parameters
     def SingleAxisSlaveParametersGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3224,8 +3051,7 @@ class XPS:
 
         return retList
 
-        # SpindleSlaveModeEnable :  Enable the slave mode
-
+    # SpindleSlaveModeEnable :  Enable the slave mode
     def SpindleSlaveModeEnable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3234,8 +3060,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SpindleSlaveModeDisable :  Disable the slave mode
-
+    # SpindleSlaveModeDisable :  Disable the slave mode
     def SpindleSlaveModeDisable(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3244,8 +3069,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SpindleSlaveParametersSet :  Set slave parameters
-
+    # SpindleSlaveParametersSet :  Set slave parameters
     def SpindleSlaveParametersSet(self, socketId, GroupName, PositionerName, Ratio):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3262,8 +3086,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SpindleSlaveParametersGet :  Get slave parameters
-
+    # SpindleSlaveParametersGet :  Get slave parameters
     def SpindleSlaveParametersGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3280,8 +3103,7 @@ class XPS:
 
         return retList
 
-        # GroupSpinParametersSet :  Modify Spin parameters on selected group and activate the continuous move
-
+    # GroupSpinParametersSet :  Modify Spin parameters on selected group and activate the continuous move
     def GroupSpinParametersSet(self, socketId, GroupName, Velocity, Acceleration):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3298,8 +3120,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupSpinParametersGet :  Get Spin parameters on selected group
-
+    # GroupSpinParametersGet :  Get Spin parameters on selected group
     def GroupSpinParametersGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3318,8 +3139,7 @@ class XPS:
 
         return retList
 
-        # GroupSpinCurrentGet :  Get Spin current on selected group
-
+    # GroupSpinCurrentGet :  Get Spin current on selected group
     def GroupSpinCurrentGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3338,8 +3158,7 @@ class XPS:
 
         return retList
 
-        # GroupSpinModeStop :  Stop Spin mode on selected group with specified acceleration
-
+    # GroupSpinModeStop :  Stop Spin mode on selected group with specified acceleration
     def GroupSpinModeStop(self, socketId, GroupName, Acceleration):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3348,8 +3167,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # XYLineArcVerification :  XY trajectory verification
-
+    # XYLineArcVerification :  XY trajectory verification
     def XYLineArcVerification(self, socketId, GroupName, TrajectoryFileName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3358,8 +3176,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # XYLineArcVerificationResultGet :  XY trajectory verification result get
-
+    # XYLineArcVerificationResultGet :  XY trajectory verification result get
     def XYLineArcVerificationResultGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3382,8 +3199,7 @@ class XPS:
 
         return retList
 
-        # XYLineArcExecution :  XY trajectory execution
-
+    # XYLineArcExecution :  XY trajectory execution
     def XYLineArcExecution(
         self,
         socketId,
@@ -3412,8 +3228,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # XYLineArcParametersGet :  XY trajectory get parameters
-
+    # XYLineArcParametersGet :  XY trajectory get parameters
     def XYLineArcParametersGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3434,8 +3249,7 @@ class XPS:
 
         return retList
 
-        # XYLineArcPulseOutputSet :  Configure pulse output on trajectory
-
+    # XYLineArcPulseOutputSet :  Configure pulse output on trajectory
     def XYLineArcPulseOutputSet(
         self, socketId, GroupName, StartLength, EndLength, PathLengthInterval
     ):
@@ -3456,8 +3270,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # XYLineArcPulseOutputGet :  Get pulse output on trajectory configuration
-
+    # XYLineArcPulseOutputGet :  Get pulse output on trajectory configuration
     def XYLineArcPulseOutputGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3478,8 +3291,7 @@ class XPS:
 
         return retList
 
-        # XYZGroupPositionCorrectedProfilerGet :  Return corrected profiler positions
-
+    # XYZGroupPositionCorrectedProfilerGet :  Return corrected profiler positions
     def XYZGroupPositionCorrectedProfilerGet(
         self, socketId, GroupName, PositionX, PositionY, PositionZ
     ):
@@ -3510,8 +3322,7 @@ class XPS:
 
         return retList
 
-        # XYZSplineVerification :  XYZ trajectory verifivation
-
+    # XYZSplineVerification :  XYZ trajectory verifivation
     def XYZSplineVerification(self, socketId, GroupName, TrajectoryFileName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3520,8 +3331,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # XYZSplineVerificationResultGet :  XYZ trajectory verification result get
-
+    # XYZSplineVerificationResultGet :  XYZ trajectory verification result get
     def XYZSplineVerificationResultGet(self, socketId, PositionerName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3544,8 +3354,7 @@ class XPS:
 
         return retList
 
-        # XYZSplineExecution :  XYZ trajectory execution
-
+    # XYZSplineExecution :  XYZ trajectory execution
     def XYZSplineExecution(
         self, socketId, GroupName, TrajectoryFileName, Velocity, Acceleration
     ):
@@ -3566,8 +3375,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # XYZSplineParametersGet :  XYZ trajectory get parameters
-
+    # XYZSplineParametersGet :  XYZ trajectory get parameters
     def XYZSplineParametersGet(self, socketId, GroupName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3588,8 +3396,7 @@ class XPS:
 
         return retList
 
-        # OptionalModuleExecute :  Execute an optional module
-
+    # OptionalModuleExecute :  Execute an optional module
     def OptionalModuleExecute(self, socketId, ModuleFileName, TaskName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3598,8 +3405,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # OptionalModuleKill :  Kill an optional module
-
+    # OptionalModuleKill :  Kill an optional module
     def OptionalModuleKill(self, socketId, TaskName):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3608,8 +3414,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EEPROMCIESet :  Set CIE EEPROM reference string
-
+    # EEPROMCIESet :  Set CIE EEPROM reference string
     def EEPROMCIESet(self, socketId, CardNumber, ReferenceString):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3618,8 +3423,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EEPROMDACOffsetCIESet :  Set CIE DAC offsets
-
+    # EEPROMDACOffsetCIESet :  Set CIE DAC offsets
     def EEPROMDACOffsetCIESet(self, socketId, PlugNumber, DAC1Offset, DAC2Offset):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3636,8 +3440,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EEPROMDriverSet :  Set Driver EEPROM reference string
-
+    # EEPROMDriverSet :  Set Driver EEPROM reference string
     def EEPROMDriverSet(self, socketId, PlugNumber, ReferenceString):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3646,8 +3449,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EEPROMINTSet :  Set INT EEPROM reference string
-
+    # EEPROMINTSet :  Set INT EEPROM reference string
     def EEPROMINTSet(self, socketId, CardNumber, ReferenceString):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3656,8 +3458,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # CPUCoreAndBoardSupplyVoltagesGet :  Get power informations
-
+    # CPUCoreAndBoardSupplyVoltagesGet :  Get power informations
     def CPUCoreAndBoardSupplyVoltagesGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3676,8 +3477,7 @@ class XPS:
 
         return retList
 
-        # CPUTemperatureAndFanSpeedGet :  Get CPU temperature and fan speed
-
+    # CPUTemperatureAndFanSpeedGet :  Get CPU temperature and fan speed
     def CPUTemperatureAndFanSpeedGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3696,8 +3496,7 @@ class XPS:
 
         return retList
 
-        # ActionListGet :  Action list
-
+    # ActionListGet :  Action list
     def ActionListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3706,8 +3505,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ActionExtendedListGet :  Action extended list
-
+    # ActionExtendedListGet :  Action extended list
     def ActionExtendedListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3716,8 +3514,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # APIExtendedListGet :  API method list
-
+    # APIExtendedListGet :  API method list
     def APIExtendedListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3726,8 +3523,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # APIListGet :  API method list without extended API
-
+    # APIListGet :  API method list without extended API
     def APIListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3736,8 +3532,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ControllerStatusListGet :  Controller status list
-
+    # ControllerStatusListGet :  Controller status list
     def ControllerStatusListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3746,8 +3541,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ErrorListGet :  Error list
-
+    # ErrorListGet :  Error list
     def ErrorListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3756,8 +3550,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # EventListGet :  General event list
-
+    # EventListGet :  General event list
     def EventListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3766,8 +3559,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringListGet :  Gathering type list
-
+    # GatheringListGet :  Gathering type list
     def GatheringListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3776,8 +3568,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringExtendedListGet :  Gathering type extended list
-
+    # GatheringExtendedListGet :  Gathering type extended list
     def GatheringExtendedListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3786,8 +3577,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringExternalListGet :  External Gathering type list
-
+    # GatheringExternalListGet :  External Gathering type list
     def GatheringExternalListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3796,8 +3586,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GroupStatusListGet :  Group status list
-
+    # GroupStatusListGet :  Group status list
     def GroupStatusListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3806,8 +3595,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # HardwareInternalListGet :  Internal hardware list
-
+    # HardwareInternalListGet :  Internal hardware list
     def HardwareInternalListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3816,8 +3604,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # HardwareDriverAndStageGet :  Smart hardware
-
+    # HardwareDriverAndStageGet :  Smart hardware
     def HardwareDriverAndStageGet(self, socketId, PlugNumber):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3826,8 +3613,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ObjectsListGet :  Group name and positioner name
-
+    # ObjectsListGet :  Group name and positioner name
     def ObjectsListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3836,8 +3622,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerErrorListGet :  Positioner error list
-
+    # PositionerErrorListGet :  Positioner error list
     def PositionerErrorListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3846,8 +3631,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerHardwareStatusListGet :  Positioner hardware status list
-
+    # PositionerHardwareStatusListGet :  Positioner hardware status list
     def PositionerHardwareStatusListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3856,8 +3640,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # PositionerDriverStatusListGet :  Positioner driver status list
-
+    # PositionerDriverStatusListGet :  Positioner driver status list
     def PositionerDriverStatusListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3866,8 +3649,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ReferencingActionListGet :  Get referencing action list
-
+    # ReferencingActionListGet :  Get referencing action list
     def ReferencingActionListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3876,8 +3658,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # ReferencingSensorListGet :  Get referencing sensor list
-
+    # ReferencingSensorListGet :  Get referencing sensor list
     def ReferencingSensorListGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3886,8 +3667,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # GatheringUserDatasGet :  Return user data values
-
+    # GatheringUserDatasGet :  Return user data values
     def GatheringUserDatasGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3906,8 +3686,7 @@ class XPS:
 
         return retList
 
-        # ControllerMotionKernelPeriodMinMaxGet :  Get controller motion kernel min/max periods
-
+    # ControllerMotionKernelPeriodMinMaxGet :  Get controller motion kernel min/max periods
     def ControllerMotionKernelPeriodMinMaxGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3926,8 +3705,7 @@ class XPS:
 
         return retList
 
-        # ControllerMotionKernelPeriodMinMaxReset :  Reset controller motion kernel min/max periods
-
+    # ControllerMotionKernelPeriodMinMaxReset :  Reset controller motion kernel min/max periods
     def ControllerMotionKernelPeriodMinMaxReset(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3936,8 +3714,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # SocketsStatusGet :  Get sockets current status
-
+    # SocketsStatusGet :  Get sockets current status
     def SocketsStatusGet(self, socketId):
         if XPS.__usedSockets[socketId] == 0:
             return
@@ -3946,8 +3723,7 @@ class XPS:
         [error, returnedString] = self.__sendAndReceive(socketId, command)
         return [error, returnedString]
 
-        # TestTCP :  Test TCP/IP transfert
-
+    # TestTCP :  Test TCP/IP transfert
     def TestTCP(self, socketId, InputString):
         if XPS.__usedSockets[socketId] == 0:
             return
