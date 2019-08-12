@@ -27,6 +27,11 @@ Instrument Classes
     :show-inheritance:
     :member-order:
 
+.. autoclass:: PCI6281
+    :members:
+    :show-inheritance:
+    :member-order:
+
 .. autoclass:: Keithley6514
     :members:
     :show-inheritance:

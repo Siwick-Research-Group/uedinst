@@ -31,6 +31,11 @@ class PCI6281:
         if abs(value) > 10:
             raise InstrumentException(f'Voltage {value} is outside of permissible bounds of +=10V')
         
+        if timeout is not None:
+            if timeout <=0:
+                raise InstrumentException(f"A time-out value of {timeout} seconds is not valid.")
+        
+        
         with nidaqmx.Task() as task: 
             task.ao_channels.add_ao_voltage_chan('Dev1/ao1')
             task.write(value)
