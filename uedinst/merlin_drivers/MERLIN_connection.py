@@ -3,8 +3,6 @@ import sys
 import re
 from time import *
 from datetime import datetime
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import numpy as np
 import struct
 from os.path import dirname, join
