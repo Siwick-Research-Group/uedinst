@@ -2,7 +2,7 @@
 __author__ = "Laurent P. René de Cotret"
 __email__ = "laurent.renedecotret@mail.mcgill.ca"
 __license__ = "BSD"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 
 class InstrumentException(Exception):
@@ -18,6 +18,7 @@ class InstrumentWarning(UserWarning):
 
 
 from .base import TCPBase, GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
+from .daq import PCI6281
 from .delay_stage import ILS250PP
 from .electrometer import Keithley6514
 from .freq_counter import RacalDana1991
