@@ -65,6 +65,7 @@ class GatanUltrascan895(TCPBase):
         toggle = str(toggle).upper()
         self.send_command("ULTRASCAN;INSERT;", toggle)
 
+    # TODO: add parameter to not subtract dark background
     def acquire_image(self, exposure):
         """ 
         Acquire an image from the detector.
