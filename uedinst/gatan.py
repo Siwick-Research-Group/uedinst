@@ -14,14 +14,14 @@ class GatanUltrascan895(TCPBase):
     """
     Interface to the Gatan Ultrascan 895 camera server.
 
-    The IP address is fixed to 127.0.0.1:42057.
+    The IP address defaults to 127.0.0.1:42057.
     """
 
     temp_image_fname = str(TEMPDIR / "_uedinst_temp.dat")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, addr='127.0.0.1', port=42057, **kwargs):
         try:
-            super().__init__("127.0.0.1", 42057)
+            super().__init__(addr=addr, port=port, **kwargs)
         except InstrumentException:
             raise InstrumentException(
                 "Could not connect to DigitalMicrograph. Make sure it is open."
@@ -83,13 +83,12 @@ class GatanUltrascan895(TCPBase):
         ------
         InstrumentException : if answer received indicates an error occurred.
         """
-        exposure = float(exposure)
         # Use a temporary file so that there can never be any conflits
         # between subsequent acquisitions.
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            "ULTRASCAN;ACQUIRE;{:.3f},{}".format(exposure, self.temp_image_fname),
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{self.temp_image_fname}",
             wait=exposure,
         )
 
