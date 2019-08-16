@@ -28,25 +28,14 @@ class GatanUltrascan895(TCPBase):
             )
 
         # Check that it is possible to get the version
-        # The initial version did not support this command.
+        #  The ealiest versions of the plugin did not support 
+        # this, so an error might be raised.
         try:
-            v = self.get_plugin_version()
+            self.version = self.send_command('ULTRASCAN;VERSION')
         except InstrumentException:
             raise InstrumentException(
                 "The uedinst plugin version installed in the GMS is too old."
             )
-        
-    def get_plugin_version(self):
-        """ 
-        Ask for the Gatan Microscopy Suite plugin version. The ealiest
-        versions of the plugin did not support this, so an error might be raised.
-        
-        Returns
-        -------
-        version : str
-            Version string, e.g. "1.0"
-        """
-        return self.send_command('ULTRASCAN;VERSION')
 
     def send_command(self, *commands, wait=0):
         """
