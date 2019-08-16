@@ -35,19 +35,19 @@ class GatanUltrascan895(TCPBase):
             )
 
         # Check that it is possible to get the version
-        #  The ealiest versions of the plugin did not support 
+        #  The ealiest versions of the plugin did not support
         # this, so an error might be raised.
         try:
-            self.version = self.send_command('ULTRASCAN;VERSION')
+            self.version = self.send_command("ULTRASCAN;VERSION")
         except InstrumentException:
             raise InstrumentException(
                 "The uedinst plugin version installed in the GMS is too old."
             )
-        
+
         if tempdir is None:
             tempdir = gettempdir()
-        self.tempdir = Path(tempdir) # Path() is idempotent
-    
+        self.tempdir = Path(tempdir)  # Path() is idempotent
+
     @property
     def temp_image_fname(self):
         """ Path to the temporary file where to save images """
