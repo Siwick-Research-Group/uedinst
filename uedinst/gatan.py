@@ -93,7 +93,7 @@ class GatanUltrascan895(TCPBase):
         toggle = str(toggle).upper()
         self.send_command("ULTRASCAN;INSERT;", toggle)
 
-    def acquire_image(self, exposure, remove_dark=True):
+    def acquire_image(self, exposure, remove_dark=True, normalize_gain=True):
         """ 
         Acquire a gain-normalized image from the detector.
         
@@ -104,6 +104,8 @@ class GatanUltrascan895(TCPBase):
         remove_dark : bool
             If True, the camera dark background will be subtracted by the
             Gatan Microscopy Suite.
+        normalize_gain : bool
+            If True, the image will be gain-normalized by the Gatan Microscopy Suite.
         
         Returns
         -------
@@ -118,7 +120,7 @@ class GatanUltrascan895(TCPBase):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(self.temp_image_fname)}",
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}",
             wait=exposure,
         )
 
