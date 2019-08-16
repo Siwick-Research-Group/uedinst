@@ -13,9 +13,9 @@ c_air = c_vacuum / air_refractive_index  # meters per second
 
 
 @unique
-class XPSQ8Errors(IntEnum):
+class XPSC8Errors(IntEnum):
     """
-    Enumeration of possible XPS-Q8 errors.
+    Enumeration of possible XPS-C8 errors.
     """
 
     # TODO: Error code and error description
@@ -57,8 +57,8 @@ def _errcheck(returned):
             errcode = returned[0]
         else:
             errcode = returned
-        error = XPSQ8Errors(int(errcode))
-        if error != XPSQ8Errors.NoError:
+        error = XPSC8Errors(int(errcode))
+        if error != XPSC8Errors.NoError:
             raise InstrumentException(error)
     return returned
 
@@ -66,7 +66,7 @@ def _errcheck(returned):
 class DelayStage(AbstractContextManager):
     """
     Abstract interface to one delay-stage
-    connected to a Newport XPS Q8.
+    connected to a Newport XPS C8.
 
     Parameters
     ----------

@@ -40,11 +40,13 @@ class GatanUltrascan895(TCPBase):
         self.socket.send(total_command.encode("ascii"))
         if wait:
             sleep(wait)
-        answer = self.socket.recv(10).decode("ascii")
+        answer = self.socket.recv(10).decode(
+            "ascii"
+        )  # Since the answer is either "OK" or "ERR", 10 chars is enough
 
         if answer == "ERR":
             raise InstrumentException(
-                "Command failed: {}.\nAnswer received: {}".format(total_command, answer)
+                f"Command failed: {total_command}.\nAnswer received: {answer}.\nSee the GMS result console for details."
             )
 
         return answer
@@ -65,7 +67,6 @@ class GatanUltrascan895(TCPBase):
         toggle = str(toggle).upper()
         self.send_command("ULTRASCAN;INSERT;", toggle)
 
-    # TODO: add parameter to not subtract dark background
     def acquire_image(self, exposure, remove_dark=True):
         """ 
         Acquire a gain-normalized image from the detector.
