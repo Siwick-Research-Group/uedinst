@@ -19,7 +19,7 @@ class GatanUltrascan895(TCPBase):
 
     temp_image_fname = str(TEMPDIR / "_uedinst_temp.dat")
 
-    def __init__(self, addr='127.0.0.1', port=42057, **kwargs):
+    def __init__(self, addr="127.0.0.1", port=42057, **kwargs):
         try:
             super().__init__(addr=addr, port=port, **kwargs)
         except InstrumentException:
@@ -66,19 +66,22 @@ class GatanUltrascan895(TCPBase):
         self.send_command("ULTRASCAN;INSERT;", toggle)
 
     # TODO: add parameter to not subtract dark background
-    def acquire_image(self, exposure):
+    def acquire_image(self, exposure, remove_dark=True):
         """ 
-        Acquire an image from the detector.
+        Acquire a gain-normalized image from the detector.
         
         Parameters
         ----------
         exposure : float
             Exposure [seconds].
+        remove_dark : bool
+            If True, the camera dark background will be subtracted by the
+            Gatan Microscopy Suite.
         
         Returns
         -------
         image : `~numpy.ndarray`, dtype int16
-            Gain-normalized, dark-background subtracted image.
+            Gain-normalized, image.
 
         Raises
         ------
@@ -89,7 +92,7 @@ class GatanUltrascan895(TCPBase):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{self.temp_image_fname}",
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{self.temp_image_fname}",
             wait=exposure,
         )
 
