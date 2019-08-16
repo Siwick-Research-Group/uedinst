@@ -15,11 +15,18 @@ class GatanUltrascan895(TCPBase):
     Interface to the Gatan Ultrascan 895 camera server.
 
     The IP address defaults to 127.0.0.1:42057.
+
+    Parameters
+    ----------
+    addr : string, optional
+        IP address of the uedinst server plugin
+    port : int, optional
+        IP port of the uedinst server plugin
+    tempdir : path or None, optional
+        Path to the temporary directory to use when saving pictures.
     """
 
-    temp_image_fname = str(TEMPDIR / "_uedinst_temp.dat")
-
-    def __init__(self, addr="127.0.0.1", port=42057, **kwargs):
+    def __init__(self, addr="127.0.0.1", port=42057, tempdir=None, **kwargs):
         try:
             super().__init__(addr=addr, port=port, **kwargs)
         except InstrumentException:
@@ -36,6 +43,15 @@ class GatanUltrascan895(TCPBase):
             raise InstrumentException(
                 "The uedinst plugin version installed in the GMS is too old."
             )
+        
+        if tempdir is None:
+            tempdir = gettempdir()
+        self.tempdir = Path(tempdir) # Path() is idempotent
+    
+    @property
+    def temp_image_fname(self):
+        """ Path to the temporary file where to save images """
+        return self.tempdir / "_uedinst_temp.dat"
 
     def send_command(self, *commands, wait=0):
         """
@@ -52,7 +68,7 @@ class GatanUltrascan895(TCPBase):
             sleep(wait)
         answer = self.socket.recv(10).decode(
             "ascii"
-        )  # Since the answer is either "OK" or "ERR", 10 chars is enough
+        )  # Since the answer is either "OK", "ERR", or a version string, 10 chars is enough
 
         if answer == "ERR":
             raise InstrumentException(
@@ -92,7 +108,6 @@ class GatanUltrascan895(TCPBase):
         Returns
         -------
         image : `~numpy.ndarray`, dtype int16
-            Gain-normalized, image.
 
         Raises
         ------
@@ -103,7 +118,7 @@ class GatanUltrascan895(TCPBase):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{self.temp_image_fname}",
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(self.temp_image_fname)}",
             wait=exposure,
         )
 
