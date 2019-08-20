@@ -158,7 +158,7 @@ def LB_SetFrequency(addr, frequency):
     frequency : float
         Measurement frequency [Hz]
     """
-    LB_API2.LB_SetFrequency(addr, value)
+    LB_API2.LB_SetFrequency(addr, frequency)
 
 
 def LB_GetFrequency(addr):
@@ -264,7 +264,7 @@ def LB_SetOffset(addr, offset):
     LB_API2.LB_SetOffset(addr, offset)
 
 
-def LB_SetOffset(addr):
+def LB_GetOffset(addr):
     """ Return the fixed offset added to the measurements. For an 
     offset that is a function of frequency, use the response function call.
     To Enable, see LB_SetOffsetEnable
@@ -313,7 +313,7 @@ class TekPSM4120:
             self.addr = LB_GetAddress_Idx(idx)
         except:
             raise RuntimeError("PSM instrument not available.")
-        LB_InitializaSensor_Addr(self.addr)
+        LB_InitializeSensor_Addr(self.addr)
         self.blink_led()
 
         model = LB_GetModelNumber_Addr(self.addr)
