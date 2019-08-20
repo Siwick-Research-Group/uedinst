@@ -1,5 +1,7 @@
 import sys
-from ctypes import CDLL, c_double, c_long
+from ctypes import CDLL, c_double, c_long, c_int
+import ctypes as ct
+from enum import IntEnum, unique
 
 # Iff DLL is not available, LB_API2 will be None
 if sys.platform == "win32":
@@ -21,14 +23,18 @@ def runtime_error_if_less_than(threshold):
 
     def errcheck(result, func, arguments):
         if result < threshold:
-            raise RuntimeError("{} failed with arguments {}".format(func, arguments))
+            raise RuntimeError(
+                f"{func.__name__} failed with result=[{result}] (arguments: {arguments})"
+            )
 
     return errcheck
 
 
 # LB_API2 might not be on this computer
+# In this case, the PSM4120 class cannot be used, but other uedinst
+# classes can.
 if LB_API2 is not None:
-    LB_API2.LB_GetAddress_Idx.errcheck = runtime_error_if_less_than(1)
+    # LB_API2.LB_GetAddress_Idx.errcheck = runtime_error_if_less_than(1)
     LB_API2.LB_InitializeSensor_Addr.errcheck = runtime_error_if_less_than(1)
     LB_API2.LB_BlinkLED_Addr.errcheck = runtime_error_if_less_than(1)
 
@@ -43,6 +49,35 @@ if LB_API2 is not None:
     LB_API2.LB_GetOffsetEnabled.errcheck = runtime_error_if_less_than(1)
     LB_API2.LB_SetOffset.errcheck = runtime_error_if_less_than(1)
     LB_API2.LB_GetOffset.errcheck = runtime_error_if_less_than(1)
+
+
+@unique
+class PSMModelEnum(IntEnum):
+    unknown = -1
+    PSM4110 = 101
+    PSM4120 = 102
+    PSM5110 = 103
+    PSM5120 = 104
+    PSM3110 = 105
+    PSM3120 = 106
+    PSM3310 = 107
+    PSM3320 = 118
+    PSM3510 = 119
+    PSM4410 = 110
+    PSM4320 = 111
+    PSM5410 = 112
+    PSM5320 = 113
+
+
+@unique
+class PowerUnits(IntEnum):
+    dBm = 0
+    dBW = 1
+    dBkW = 20
+    dBuV = 3
+    W = 4
+    V = 5
+    dBrel = 6
 
 
 def LB_GetAddress_Idx(idx):
@@ -85,24 +120,6 @@ def LB_BlinkLED_Addr(addr):
     LB_API2.LB_BlinkLED_Addr(addr)
 
 
-psm_models = {
-    -1: "unknown",
-    101: "PSM4110",
-    102: "PSM4120",
-    103: "PSM5110",
-    104: "PSM5120",
-    105: "PSM3110",
-    106: "PSM3120",
-    107: "PSM3310",
-    108: "PSM3320",
-    109: "PSM3510",
-    110: "PSM4410",
-    111: "PSM4320",
-    112: "PSM5410",
-    113: "PSM5320",
-}
-
-
 def LB_GetModelNumber_Addr(addr):
     """ 
     Get the model number from an address.
@@ -116,7 +133,9 @@ def LB_GetModelNumber_Addr(addr):
     -------
     model : str
     """
-    return psm_models[LB_API2.LB_GetModelNumber_Addr(addr)]
+    result = c_int()
+    LB_API2.LB_GetModelNumber_Addr(c_long(addr), ct.pointer(result))
+    return PSMModelEnum[result.value]
 
 
 #######################################################################################
@@ -138,8 +157,8 @@ def LB_MeasureCW(addr):
         CW measurement
     """
     CW = c_double()
-    result = LB_API2.LB_MeasureCW(addr, CW)
-    return float(CW)
+    LB_API2.LB_MeasureCW(addr, ct.pointer(CW))
+    return float(CW.value)
 
 
 #######################################################################################
@@ -158,6 +177,7 @@ def LB_SetFrequency(addr, frequency):
     frequency : float
         Measurement frequency [Hz]
     """
+    frequency = c_double(frequency)
     LB_API2.LB_SetFrequency(addr, frequency)
 
 
@@ -174,23 +194,21 @@ def LB_GetFrequency(addr):
     out : float
         Measurement frequency [Hz]
     """
-    value = c_double()
-    LB_API2.LB_GetFrequency(addr, value)
-    return float(value)
+    freq = c_double()
+    LB_API2.LB_GetFrequency(addr, ct.pointer(freq))
+    return float(freq.value)
 
 
 def LB_SetMeasurementPowerUnits(addr, units):
-    """ Set the measurement power units. Valid units are given by:
-    DBM = 0, DBW = 1, DBKW = 2, DBUV = 3, W = 4, V = 5, DBREL = 6 
+    """ Set the measurement power units.
     
     Parameters
     ----------
     addr : int
         Address of the instrument.
-    units : int
-        Valid units are given by: DBM = 0, DBW = 1, DBKW = 2, 
-        DBUV = 3, W = 4, V = 5, DBREL = 6
+    units : PowerUnits
     """
+    units = c_int(int(PowerUnits(units)))
     LB_API2.LB_SetMeasurementPowerUnits(addr, units)
 
 
@@ -204,13 +222,11 @@ def LB_GetMeasurementPowerUnits(addr):
     
     Returns
     -------
-    units : int
-        Valid units are given by: DBM = 0, DBW = 1, DBKW = 2, 
-        DBUV = 3, W = 4, V = 5, DBREL = 6
+    units : PowerUnits
     """
-    units = c_long()
-    err = LB_API2.LB_GetMeasurementPowerUnits(addr, units)
-    return int(units)
+    units = c_int()
+    LB_API2.LB_GetMeasurementPowerUnits(addr, ct.pointer(units))
+    return PowerUnits(units.value)
 
 
 #######################################################################################
@@ -294,18 +310,6 @@ class TekPSM4120:
         Power-meter ID
     """
 
-    # Conversion between power units and integers
-    units_to_num = {
-        "dbm": 0,
-        "dbw": 1,
-        "dbkw": 2,
-        "dbuv": 3,
-        "w": 4,
-        "v": 5,
-        "dbrel": 6,
-    }
-    num_to_units = dict((value, key) for key, value in units_to_num.items())
-
     def __init__(self, idx=1):
         # Check for successful initialization. If so, blink LEDS
         # If a connection cannot be made, RuntimeError will be raised.
@@ -316,14 +320,9 @@ class TekPSM4120:
         LB_InitializeSensor_Addr(self.addr)
         self.blink_led()
 
-        model = LB_GetModelNumber_Addr(self.addr)
-        try:
-            assert model == "PSM4120"
-        except:
-            RuntimeError("Unexpected model number: {}".format(model))
-
         # Set-up default measurement parameters
-        self.set_power_units("dBm")
+        self.set_power_units(PowerUnits.dBm)
+        self.set_measurement_frequency(3) #GHz
 
     def blink_led(self):
         """ Blink LEDs four times """
@@ -383,8 +382,7 @@ class TekPSM4120:
     @property
     def power_units(self):
         """ measurement power units """
-        units = LB_GetMeasurementPowerUnits(self.addr)
-        return self.num_to_units[units]
+        return LB_GetMeasurementPowerUnits(self.addr)
 
     def set_power_units(self, units):
         """ 
@@ -392,7 +390,6 @@ class TekPSM4120:
         
         Parameters
         ----------
-        units : str, {'dBm', 'dBw', 'dBkW', 'dBuV','W', 'V', 'dBrel'}
-            Power units (case insensitive)
+        units : PowerUnits
         """
-        LB_SetMeasurementPowerUnits(self.addr, self.units_to_num[units.lower()])
+        LB_SetMeasurementPowerUnits(self.addr, units)
