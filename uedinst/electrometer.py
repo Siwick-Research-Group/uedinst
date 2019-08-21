@@ -2,7 +2,8 @@ from contextlib import suppress
 
 import numpy as np
 from pyvisa import ResourceManager
-
+from math import ceil
+from time import sleep
 from warnings import warn
 from . import GPIBBase, InstrumentException
 
@@ -29,14 +30,8 @@ class Keithley6514(GPIBBase):
 
     def __init__(self, addr, **kwargs):
         super().__init__(addr, **kwargs)
-        self.write("*RST;*CLS")
-        self.write("FORM:ELEM READ, TIME")
 
-        # Unless the following commands are given
-        # self.wait_for_srq() always times out
-        self.write("STAT:PRES")  # Reset all event lines
-        self.write("STAT:MEAS:ENAB 512")
-        self.write("VOLT:NPLC 0.01")
+        self.write("*RST;*CLS")
 
     def __exit__(self, *exc):
         error_codes = self.error_codes()
@@ -72,7 +67,6 @@ class Keithley6514(GPIBBase):
             String error codes. If no error codes,
         """
         errors = self.query("SYST:ERR:CODE:ALL?").strip("\n")
-        self.write("SYST:CLE")  # clear error queue
         try:
             int(errors) == 0
         except ValueError:
@@ -127,85 +121,67 @@ class Keithley6514(GPIBBase):
             )
 
         self.write("CONF:{}".format(func))
-        self.write("{}:NPLC 0.01".format(func))
-
-    def acquire_buffered(self, num, timeout=None, nplc=0.01):
+    
+    def integrate(self, func, time):
         """
-        Acquire ``num`` buffered readings. 
+        Integrate the currently-chosen function for `time` amounts of time.
 
         Parameters
         ----------
-        num : int
-            Number of measurements to store in buffer. Maximum of 2500 values.
-        timeout : int or None, optional
-            Timeout of the operation in milliseconds. 
-            If None (default), timeout is disabled.
-        nplc : float, [0.01 - 10]
-            Integration time in number of power-line cycles (NPLC).
-            For reference, nplc = 6 -> 16.67ms of integration time.
-        
-        Returns
-        -------
-        arr : `~numpy.ndarray`, shape (N,2)
-            Time and readings arrays. The first column are the
-            time-stamps in seconds, while the second column are the readings.
-        
-        Raises
-        ------
-        ValueError: if ``num`` is too large (> 2500)
-        ValueError: if ``nplc`` is out-of-bounds
-        InstrumentException: if buffer didn't fill up before timeout expired
-
-        Notes
-        -----
-        For best performance, the display should be toggled off.
+        time : float
+            Integration time [s]
         """
-        num = int(num)
-        if num > 2500:
-            raise ValueError("Cannot store more than 2500 readings in the buffer.")
+        # Noise is lowers for nplc=1
+        # NPLC = number of power-line cycles
+        # Reading time is actually empirically ~3 times 
+        # higher than the integration time
+        nplc = 10 # maximum
+        integration_time = nplc / 60
+        one_reading_time = 3 * integration_time
 
-        nplc = float(nplc)
-        if (nplc < 0.01) or (nplc > 10):
-            raise ValueError(
-                "Cannot integrate for {:.2f} NPLCs. Choose a value in [0.01, 10]"
-            )
+        self.set_measurement_function(func)
+        self.write(f'{func}:NPLC {nplc}')
 
-        self.write("VOLT:NPLC {:.2f}".format(nplc))
-        self.write("TRIG:COUN {}".format(num))
+        # We acquire at least enough readings, and potentially a little more
+        # This way, we may reject readings that were too late based on time-stamps
+        # Its better to acquire too many readings than too little.
+        num_readings = ceil(time / one_reading_time) + 2
 
-        self.write("*SRE 9")  # Lookout for buffer full
+        if num_readings > 2500:
+            raise ValueError(f'Integration time of {time}s results in too many measurements.')
 
-        self.write("TRAC:CLE")  # Clear buffer
-        self.write("TRAC:POIN {}".format(num))  # Set number of buffer points
-        self.write("TRAC:FEED SENS1")  # Store raw measurements
-        self.write("TRAC:FEED:CONT NEXT")  # Start buffered acquisition
-
-        self.toggle_autozero(False)
-        self.toggle_zero_check(False)
-        self.toggle_display(False)
-        self.write("INIT")  # Bring electrometer out of idle state
-
-        # Prepare some things while data acquisition
-        arr = np.empty(shape=(num, 2), dtype=np.float)
         to_arr = lambda iterable: np.fromiter(
-            map(float, iterable), dtype=np.float, count=num
+            map(float, iterable), dtype=np.float, count=num_readings
         )
 
-        # Wait until buffer is full
-        # then clear event registers
-        self.wait_for_srq(timeout)
-        self.write("*CLS")
+        self.write('ARM:SOUR IMM')
+        self.write('ARM:COUN 1')
+        self.write(f'TRIG:COUN {int(num_readings)}')
+        self.write("TRIG:DEL 0") # delay
 
+        self.write("*SRE 1")
+        self.write("*SRE 9")  # Lookout for buffer full
+
+        self.write("TRAC:CLE")
+        self.write("TRAC:TST:FORM ABS")
+        self.write("FORM:ELEM READ,TIME")
+        self.write(f"TRAC:POIN {int(num_readings)}")
+        self.write(f"TRAC:FEED SENS1;FEED:CONT NEXT")
+        self.write(f"INIT")
+
+        # Technically, we should wait_for_srq; however, this has proven to be very unreliable.
+        sleep(1.1 * time)
+
+        #npoints = int(self.query("TRAC:POIN:ACT?"))
+        #print(f'Acquired {npoints} points')
         data = self.query("TRAC:DATA?").split(",")
 
-        arr[:, 0] = to_arr(data[1::2])  # time
-        arr[:, 1] = to_arr(data[0::2])  # readings
+        readings = to_arr(data[0::2])
+        times    = to_arr(data[1::2])
+        times   -= times.min()
 
-        self.toggle_display(True)
-        self.toggle_zero_check(True)
-        self.toggle_display(True)
-
-        return arr
+        in_bounds = times <= time
+        return np.trapz(y=readings[in_bounds], x=times[in_bounds])
 
     def toggle_display(self, toggle):
         """ Enable or disable electrometer display. Faster acquisition is possible if the display is
