@@ -1,10 +1,12 @@
 from contextlib import suppress
-
-import numpy as np
-from pyvisa import ResourceManager
 from math import ceil
 from time import sleep
 from warnings import warn
+
+import numpy as np
+from pyvisa import ResourceManager
+from scipy.constants import elementary_charge
+
 from . import GPIBBase, InstrumentException
 
 
@@ -212,3 +214,38 @@ class Keithley6514(GPIBBase):
         if autozeroing is turned off """
         b = "ON" if toggle else "OFF"
         self.write("SYST:ZCH {}".format(b))
+
+class ExperimentElectrometer(Keithley6514):
+    """
+    Implementation of specific methods for experiments performed in the Siwick Research Group
+    """
+
+    def integrate_ecount_on_trigger(self, time, nplc=1):
+        """
+        This function arms the electrometer for a measurement of charge,
+        triggered on TLINK 1, for `time` seconds, and returns the number
+        of electrons measured.
+
+        This function is specifically for experiments performed in the Siwick lab.
+
+        Parameters
+        ----------
+        time : float
+            Integration time [s]
+        nplc : float, optional
+            Integration time in number of power-line cycles, i.e. factors of 60Hz. 
+            Must be in the [0.01, 10] range (inclusive). Note that the default value 
+            has the lowest measurement noise. `nplc < 1` drastically increases 
+            measurement noise, while `1 < nplc < 10` is best.
+
+        Returns
+        -------
+        ecout : float
+            Number of electrons detected.
+        """
+        self.write('SENS:CHAR:ADIS:STAT OFF')   # Turn Auto-discharge off
+        self.write('SENS:CHAR:RANG:UPP 200E-9') # Most sensitive range of charge measurements
+
+        self.set_trigger_source('TLIN')
+        self.set_input_trigger_line(1)
+        return self.integrate(func='CHAR', time=time, nplc=nplc)/elementary_charge
