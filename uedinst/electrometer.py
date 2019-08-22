@@ -124,7 +124,7 @@ class Keithley6514(GPIBBase):
 
         self.write("CONF:{}".format(func))
 
-    def integrate(self, func, time, nplc=1):
+    def integrate(self, func, time, nplc=10):
         """
         Integrate the currently-chosen function for `time` amounts of time.
 
@@ -137,8 +137,7 @@ class Keithley6514(GPIBBase):
         nplc : float, optional
             Integration time in number of power-line cycles, i.e. factors of 60Hz. 
             Must be in the [0.01, 10] range (inclusive). Note that the default value 
-            has the lowest measurement noise. `nplc < 1` drastically increases 
-            measurement noise, while `1 < nplc < 10` is best.
+            has the lowest measurement noise.
         """
         if not (0.01 <= nplc <= 10):
             raise ValueError(f"nplc values must be within [0.01, 10], but got {nplc}.")
@@ -223,7 +222,7 @@ class ExperimentElectrometer(Keithley6514):
     Implementation of specific methods for experiments performed in the Siwick Research Group
     """
 
-    def integrate_ecount_on_trigger(self, time, nplc=1):
+    def integrate_ecount_on_trigger(self, time, nplc=10):
         """
         This function arms the electrometer for a measurement of charge,
         triggered on TLINK 1, for `time` seconds, and returns the number
@@ -238,8 +237,7 @@ class ExperimentElectrometer(Keithley6514):
         nplc : float, optional
             Integration time in number of power-line cycles, i.e. factors of 60Hz. 
             Must be in the [0.01, 10] range (inclusive). Note that the default value 
-            has the lowest measurement noise. `nplc < 1` drastically increases 
-            measurement noise, while `1 < nplc < 10` is best.
+            has the lowest measurement noise.
 
         Returns
         -------
@@ -253,4 +251,6 @@ class ExperimentElectrometer(Keithley6514):
 
         self.set_trigger_source("TLIN")
         self.set_input_trigger_line(1)
-        return self.integrate(func="CHAR", time=time, nplc=nplc) / elementary_charge
+        
+        # Note that the charge of an electron is -e, not e
+        return self.integrate(func="CHAR", time=time, nplc=nplc) / -elementary_charge
