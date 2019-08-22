@@ -171,7 +171,7 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         super().close()
 
     def acquire_image_with_ecount(
-        self, exposure, remove_dark=True, normalize_gain=True, nplc=1
+        self, exposure, remove_dark=True, normalize_gain=True, nplc=10
     ):
         """ 
         Acquire an image from the detector, while simultaneously measure the number of electrons
@@ -189,8 +189,7 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         nplc : float, optional
             Integration time in number of power-line cycles, i.e. factors of 60Hz. 
             Must be in the [0.01, 10] range (inclusive). Note that the default value 
-            has the lowest measurement noise. `nplc < 1` drastically increases 
-            measurement noise, while `1 < nplc < 10` is best.
+            has the lowest measurement noise.
         
         Returns
         -------
