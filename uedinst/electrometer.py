@@ -251,6 +251,6 @@ class ExperimentElectrometer(Keithley6514):
 
         self.set_trigger_source("TLIN")
         self.set_input_trigger_line(1)
-        
+
         # Note that the charge of an electron is -e, not e
         return self.integrate(func="CHAR", time=time, nplc=nplc) / -elementary_charge

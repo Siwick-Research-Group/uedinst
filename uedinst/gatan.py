@@ -11,6 +11,7 @@ TEMPDIR = Path(gettempdir())
 INT16INFO = np.iinfo(np.int16)
 NULL = b"\00"
 
+
 class GatanUltrascan895(TCPBase):
     """
     Interface to the Gatan Ultrascan 895 camera server.
