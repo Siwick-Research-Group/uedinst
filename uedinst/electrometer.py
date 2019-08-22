@@ -123,7 +123,7 @@ class Keithley6514(GPIBBase):
             )
 
         self.write("CONF:{}".format(func))
-    
+
     def integrate(self, func, time, nplc=1):
         """
         Integrate the currently-chosen function for `time` amounts of time.
@@ -141,22 +141,22 @@ class Keithley6514(GPIBBase):
             measurement noise, while `1 < nplc < 10` is best.
         """
         if not (0.01 <= nplc <= 10):
-            raise ValueError(f'nplc values must be within [0.01, 10], but got {nplc}.')
-            
+            raise ValueError(f"nplc values must be within [0.01, 10], but got {nplc}.")
+
         # NPLC = number of power-line cycles
-        # Reading time is actually empirically ~3 times 
+        # Reading time is actually empirically ~3 times
         # higher than the integration time
         integration_time = nplc / 60
         one_reading_time = 3 * integration_time
 
         # For some reason, the "toggling" of zero-check is also the recommended way
         # to perform a zero-check.
-        # Note that the recommended time to make a zero-check is **before** selecting a 
+        # Note that the recommended time to make a zero-check is **before** selecting a
         # measurement function, for some reason.
         self.toggle_zero_check(True)
 
         self.set_measurement_function(func)
-        self.write(f'{func}:NPLC {nplc}')
+        self.write(f"{func}:NPLC {nplc}")
 
         # We acquire at least enough readings, and potentially a little more
         # This way, we may reject readings that were too late based on time-stamps
@@ -164,15 +164,17 @@ class Keithley6514(GPIBBase):
         num_readings = ceil(time / one_reading_time) + 2
 
         if num_readings > 2500:
-            raise ValueError(f'Integration time of {time}s results in too many measurements.')
+            raise ValueError(
+                f"Integration time of {time}s results in too many measurements."
+            )
 
         to_arr = lambda iterable: np.fromiter(
             map(float, iterable), dtype=np.float, count=num_readings
         )
 
-        self.write('ARM:SOUR IMM')
-        self.write('ARM:COUN 1')
-        self.write(f'TRIG:COUN {int(num_readings)}')
+        self.write("ARM:SOUR IMM")
+        self.write("ARM:COUN 1")
+        self.write(f"TRIG:COUN {int(num_readings)}")
 
         self.write("TRAC:CLE")
         self.write("TRAC:TST:FORM ABS")
@@ -186,13 +188,13 @@ class Keithley6514(GPIBBase):
         # Technically, we should wait_for_srq; however, this has proven to be very unreliable.
         sleep(1.1 * time)
 
-        #npoints = int(self.query("TRAC:POIN:ACT?"))
-        #print(f'Acquired {npoints} points')
+        # npoints = int(self.query("TRAC:POIN:ACT?"))
+        # print(f'Acquired {npoints} points')
         data = self.query("TRAC:DATA?").split(",")
 
         readings = to_arr(data[0::2])
-        times    = to_arr(data[1::2])
-        times   -= times.min()
+        times = to_arr(data[1::2])
+        times -= times.min()
 
         in_bounds = times <= time
         return np.trapz(y=readings[in_bounds], x=times[in_bounds])
@@ -214,6 +216,7 @@ class Keithley6514(GPIBBase):
         if autozeroing is turned off """
         b = "ON" if toggle else "OFF"
         self.write("SYST:ZCH {}".format(b))
+
 
 class ExperimentElectrometer(Keithley6514):
     """
@@ -243,9 +246,11 @@ class ExperimentElectrometer(Keithley6514):
         ecout : float
             Number of electrons detected.
         """
-        self.write('SENS:CHAR:ADIS:STAT OFF')   # Turn Auto-discharge off
-        self.write('SENS:CHAR:RANG:UPP 200E-9') # Most sensitive range of charge measurements
+        self.write("SENS:CHAR:ADIS:STAT OFF")  # Turn Auto-discharge off
+        self.write(
+            "SENS:CHAR:RANG:UPP 200E-9"
+        )  # Most sensitive range of charge measurements
 
-        self.set_trigger_source('TLIN')
+        self.set_trigger_source("TLIN")
         self.set_input_trigger_line(1)
-        return self.integrate(func='CHAR', time=time, nplc=nplc)/elementary_charge
+        return self.integrate(func="CHAR", time=time, nplc=nplc) / elementary_charge

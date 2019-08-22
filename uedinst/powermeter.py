@@ -322,7 +322,7 @@ class TekPSM4120:
 
         # Set-up default measurement parameters
         self.set_power_units(PowerUnits.dBm)
-        self.set_measurement_frequency(3) #GHz
+        self.set_measurement_frequency(3)  # GHz
 
     def blink_led(self):
         """ Blink LEDs four times """

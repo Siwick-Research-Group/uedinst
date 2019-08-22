@@ -65,7 +65,7 @@ class GatanUltrascan895(TCPBase):
         """
         total_command = "".join(commands)
         self.socket.send(total_command.encode("ascii"))
-    
+
     def read_answer(self):
         """ Read data from the socket """
         answer = self.socket.recv(10).decode(
@@ -78,7 +78,6 @@ class GatanUltrascan895(TCPBase):
             )
 
         return answer
-
 
     def insert(self, toggle):
         """
@@ -95,7 +94,7 @@ class GatanUltrascan895(TCPBase):
         """
         toggle = str(toggle).upper()
         self.send_command("ULTRASCAN;INSERT;", toggle)
-        self.read_answer() # error check
+        self.read_answer()  # error check
 
     def acquire_image(self, exposure, remove_dark=True, normalize_gain=True):
         """ 
@@ -124,10 +123,10 @@ class GatanUltrascan895(TCPBase):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}",
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}"
         )
         sleep(exposure)
-        _ = self.read_answer() # Error check
+        _ = self.read_answer()  # Error check
 
         # We save the images as raw format
         # because the 'translation' to TIFF was buggy
@@ -139,22 +138,42 @@ class GatanUltrascan895(TCPBase):
         # Therefore, we can safely cast as int16 (after clipping)
         np.clip(arr, INT16INFO.min, INT16INFO.max, out=arr)
         return arr.astype(np.int16)
-    
+
+
 class GatanUltrascan895WithElectrometer(GatanUltrascan895):
     """
     Virtual instrument composed of both a Gatan Ultrascan 895 and a Faraday-cup connected
-    to an electrometer
-    """
-    def __init__(self, camera_addr="127.0.0.1", camera_port=42057, emeter_addr="GPIB::25", **kwargs):
-        super().__init__(addr=camera_addr, oirt=camera_port, **kwargs)
+    to an electrometer.
 
+    Parameters
+    ----------
+    camera_addr : string, optional
+        IP address of the uedinst server plugin
+    camera_port : int, optional
+        IP port of the uedinst server plugin
+    emeter_addr : string, optional
+        Address of the electrometer
+    tempdir : path or None, optional
+        Path to the temporary directory to use when saving pictures.
+    """
+
+    def __init__(
+        self,
+        camera_addr="127.0.0.1",
+        camera_port=42057,
+        emeter_addr="GPIB::25",
+        **kwargs,
+    ):
+        super().__init__(addr=camera_addr, oirt=camera_port, **kwargs)
         self.electrometer = ExperimentElectrometer(addr=emeter_addr)
-    
+
     def close(self):
         self.electrometer.close()
         super().close()
 
-    def acquire_image_with_ecount(self, exposure, remove_dark=True, normalize_gain=True, nplc=1):
+    def acquire_image_with_ecount(
+        self, exposure, remove_dark=True, normalize_gain=True, nplc=1
+    ):
         """ 
         Acquire an image from the detector, while simultaneously measure the number of electrons
         on the Faraday cup.
@@ -190,13 +209,13 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}",
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}"
         )
 
         ecount = self.electrometer.integrate_ecount_on_trigger(time=exposure, nplc=nplc)
 
         # The method above is blocking, so we are safe to ask for an answer at this time.
-        _ = self.read_answer() # error check
+        _ = self.read_answer()  # error check
 
         # We save the images as raw format
         # because the 'translation' to TIFF was buggy
