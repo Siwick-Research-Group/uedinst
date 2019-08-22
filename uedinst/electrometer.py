@@ -122,22 +122,36 @@ class Keithley6514(GPIBBase):
 
         self.write("CONF:{}".format(func))
     
-    def integrate(self, func, time):
+    def integrate(self, func, time, nplc=1):
         """
         Integrate the currently-chosen function for `time` amounts of time.
 
         Parameters
         ----------
+        func : {'VOLT', 'CURR', 'RES', 'CHAR'}
+            Measurement function
         time : float
             Integration time [s]
+        nplc : float, optional
+            Integration time in number of power-line cycles, i.e. factors of 60Hz. 
+            Must be in the [0.01, 10] range (inclusive). Note that the default value 
+            has the lowest measurement noise. `nplc < 1` drastically increases 
+            measurement noise, while `1 < nplc < 10` is best.
         """
-        # Noise is lowers for nplc=1
+        if not (0.01 <= nplc <= 10):
+            raise ValueError(f'nplc values must be within [0.01, 10], but got {nplc}.')
+            
         # NPLC = number of power-line cycles
         # Reading time is actually empirically ~3 times 
         # higher than the integration time
-        nplc = 10 # maximum
         integration_time = nplc / 60
         one_reading_time = 3 * integration_time
+
+        # For some reason, the "toggling" of zero-check is also the recommended way
+        # to perform a zero-check.
+        # Note that the recommended time to make a zero-check is **before** selecting a 
+        # measurement function, for some reason.
+        self.toggle_zero_check(True)
 
         self.set_measurement_function(func)
         self.write(f'{func}:NPLC {nplc}')
@@ -157,16 +171,14 @@ class Keithley6514(GPIBBase):
         self.write('ARM:SOUR IMM')
         self.write('ARM:COUN 1')
         self.write(f'TRIG:COUN {int(num_readings)}')
-        self.write("TRIG:DEL 0") # delay
-
-        self.write("*SRE 1")
-        self.write("*SRE 9")  # Lookout for buffer full
 
         self.write("TRAC:CLE")
         self.write("TRAC:TST:FORM ABS")
         self.write("FORM:ELEM READ,TIME")
         self.write(f"TRAC:POIN {int(num_readings)}")
         self.write(f"TRAC:FEED SENS1;FEED:CONT NEXT")
+
+        # Launch measurement
         self.write(f"INIT")
 
         # Technically, we should wait_for_srq; however, this has proven to be very unreliable.
