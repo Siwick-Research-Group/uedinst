@@ -9,7 +9,7 @@ from .electrometer import ExperimentElectrometer
 
 TEMPDIR = Path(gettempdir())
 INT16INFO = np.iinfo(np.int16)
-
+NULL = b"\00"
 
 class GatanUltrascan895(TCPBase):
     """
@@ -55,7 +55,7 @@ class GatanUltrascan895(TCPBase):
         """ Path to the temporary file where to save images """
         return self.tempdir / "_uedinst_temp.dat"
 
-    def send_command(self, *commands, wait=0):
+    def send_command(self, *commands):
         """
         Send commands to the camera server. This method returns immediately.
         
@@ -64,7 +64,7 @@ class GatanUltrascan895(TCPBase):
         InstrumentException : if answer received indicates an error occurred.
         """
         total_command = "".join(commands)
-        self.socket.send(total_command.encode("ascii"))
+        self.socket.sendall(total_command.encode("ascii") + NULL)
 
     def read_answer(self):
         """ Read data from the socket """
@@ -92,8 +92,7 @@ class GatanUltrascan895(TCPBase):
         ------
         InstrumentException : if answer received indicates an error occurred.
         """
-        toggle = str(toggle).upper()
-        self.send_command("ULTRASCAN;INSERT;", toggle)
+        self.send_command(f"ULTRASCAN;INSERT;{int(toggle)}")
         self.read_answer()  # error check
 
     def acquire_image(self, exposure, remove_dark=True, normalize_gain=True):
@@ -123,7 +122,7 @@ class GatanUltrascan895(TCPBase):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}"
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{int(remove_dark)},{int(normalize_gain)},{str(self.temp_image_fname)}"
         )
         sleep(exposure)
         _ = self.read_answer()  # Error check
