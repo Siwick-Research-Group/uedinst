@@ -18,6 +18,8 @@ class InstrumentWarning(UserWarning):
 
 
 from .base import TCPBase, GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
+
+from .attenuator import VariableAttenuator
 from .daq import PCI6281
 from .delay_stage import ILS250PP
 from .electrometer import Keithley6514
