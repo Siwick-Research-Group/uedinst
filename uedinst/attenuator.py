@@ -22,7 +22,7 @@ class VariableAttenuator(AbstractContextManager):
     def errcheck(cls, result):
         """ Perform error-checking. Raise exception if result is not `Result.Ok` """
         if result != Result.Ok:
-            raise InstrumentException(f'Error: {result}')
+            raise InstrumentException(f"Error: {result}")
 
     def __init__(self, **kwargs):
         devenum = self.lib.enumerate_devices(PROBE_FLAGS, b"")
@@ -41,7 +41,7 @@ class VariableAttenuator(AbstractContextManager):
 
     def close(self):
         self.lib.close_device(ct.byref(ct.cast(self.device_id, ct.POINTER(ct.c_int))))
-    
+
     @property
     def speed(self):
         """ Get motor speed [steps / s]"""
