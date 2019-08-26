@@ -49,7 +49,7 @@ class GatanUltrascan895(TCPBase):
 
         if tempdir is None:
             tempdir = gettempdir()
-        self.tempdir = Path(tempdir)  # Path() is idempotent
+        self.tempdir = Path(tempdir)
 
     @property
     def temp_image_fname(self):
@@ -123,7 +123,7 @@ class GatanUltrascan895(TCPBase):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{int(remove_dark)},{int(normalize_gain)},{str(self.temp_image_fname)}"
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{int(remove_dark)},{int(normalize_gain)},{self.temp_image_fname}"
         )
         sleep(exposure)
         _ = self.read_answer()  # Error check
@@ -132,7 +132,7 @@ class GatanUltrascan895(TCPBase):
         # because the 'translation' to TIFF was buggy
         # Therefore, better to get to the raw data and cast ourselves.
         with open(self.temp_image_fname, mode="rb") as datafile:
-            arr = np.fromfile(datafile, dtype=np.int32).reshape((2048, 2048))
+            arr = np.fromfile(datafile, dtype=np.int16).reshape((2048, 2048))
 
         # Gatan Ultrascan 895 can't actually detect higher than ~30 000 counts
         # Therefore, we can safely cast as int16 (after clipping)
