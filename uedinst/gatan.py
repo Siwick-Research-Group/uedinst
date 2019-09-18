@@ -80,6 +80,23 @@ class GatanUltrascan895(TCPBase):
 
         return answer
 
+    def toggle_debug(self, toggle):
+        """
+        Toggle the debug output of the plugin, visible in the Digital Micrograph
+        results window.
+
+        Parameters
+        ----------
+        toggle : bool
+            If True, debug output will be shown. Otherwise, it will be hidden.
+
+        Raises
+        ------
+        InstrumentException : if answer received indicates an error occurred.
+        """
+        self.send_command(f"ULTRASCAN;DEBUG;{int(toggle)}")
+        self.read_answer()  # error check
+
     def insert(self, toggle):
         """
         Insert/uninsert into the beam.
@@ -127,13 +144,21 @@ class GatanUltrascan895(TCPBase):
         )
         sleep(exposure)
         _ = self.read_answer()  # Error check
+        
+        # It would appear that if remove_dark and normalize_gain are both equal, 
+        # then the data-type is uint16
+        
+        if (remove_dark == normalize_gain):
+            raw_dtype = np.uint16
+        else:
+            raw_dtype = np.int32
 
         # We save the images as raw format
         # because the 'translation' to TIFF was buggy
         # Therefore, better to get to the raw data and cast ourselves.
         with open(self.temp_image_fname, mode="rb") as datafile:
-            arr = np.fromfile(datafile, dtype=np.int16).reshape((2048, 2048))
-
+            arr = np.fromfile(datafile, dtype=raw_dtype).reshape((2048, 2048))
+        
         # Gatan Ultrascan 895 can't actually detect higher than ~30 000 counts
         # Therefore, we can safely cast as int16 (after clipping)
         np.clip(arr, INT16INFO.min, INT16INFO.max, out=arr)
@@ -164,7 +189,7 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         emeter_addr="GPIB::25",
         **kwargs,
     ):
-        super().__init__(addr=camera_addr, oirt=camera_port, **kwargs)
+        super().__init__(addr=camera_addr, port=camera_port, **kwargs)
         self.electrometer = ExperimentElectrometer(addr=emeter_addr)
 
     def close(self):
@@ -208,7 +233,7 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         # Note: we cannot use NamedTemporaryFile because it doesn't create
         # a name, but a file-like object.
         self.send_command(
-            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{str(remove_dark)},{str(normalize_gain)},{str(self.temp_image_fname)}"
+            f"ULTRASCAN;ACQUIRE;{float(exposure):.3f},{int(remove_dark)},{int(normalize_gain)},{self.temp_image_fname}"
         )
 
         ecount = self.electrometer.integrate_ecount_on_trigger(time=exposure, nplc=nplc)
@@ -216,12 +241,17 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         # The method above is blocking, so we are safe to ask for an answer at this time.
         _ = self.read_answer()  # error check
 
+        if (remove_dark == normalize_gain):
+            raw_dtype = np.uint16
+        else:
+            raw_dtype = np.int32
+
         # We save the images as raw format
         # because the 'translation' to TIFF was buggy
         # Therefore, better to get to the raw data and cast ourselves.
         with open(self.temp_image_fname, mode="rb") as datafile:
-            arr = np.fromfile(datafile, dtype=np.int32).reshape((2048, 2048))
-
+            arr = np.fromfile(datafile, dtype=raw_dtype).reshape((2048, 2048))
+        
         # Gatan Ultrascan 895 can't actually detect higher than ~30 000 counts
         # Therefore, we can safely cast as int16 (after clipping)
         np.clip(arr, INT16INFO.min, INT16INFO.max, out=arr)

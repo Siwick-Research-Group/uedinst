@@ -34,6 +34,7 @@ class Keithley6514(GPIBBase):
         super().__init__(addr, **kwargs)
 
         self.write("*RST;*CLS")
+        self.write("TRIG:TRIG:CLE")
 
     def __exit__(self, *exc):
         error_codes = self.error_codes()
@@ -41,6 +42,7 @@ class Keithley6514(GPIBBase):
             warn("Error codes: {}".format(error_codes), UserWarning)
         with suppress(InstrumentException):
             self.write("*RST;*CLS")
+            self.write("ABOR")
         super().__exit__(*exc)
 
     @property
@@ -170,9 +172,9 @@ class Keithley6514(GPIBBase):
         to_arr = lambda iterable: np.fromiter(
             map(float, iterable), dtype=np.float, count=num_readings
         )
-
-        self.write("ARM:SOUR IMM")
+        
         self.write("ARM:COUN 1")
+        self.write('TRIG:SOUR IMM')
         self.write(f"TRIG:COUN {int(num_readings)}")
 
         self.write("TRAC:CLE")
@@ -249,8 +251,10 @@ class ExperimentElectrometer(Keithley6514):
             "SENS:CHAR:RANG:UPP 200E-9"
         )  # Most sensitive range of charge measurements
 
-        self.set_trigger_source("TLIN")
+        self.write("ARM:SOUR TLIN")
         self.set_input_trigger_line(1)
+        # The trigger line depends on the adapter. By default, the electrometer
+        # will arm off of line 1, which is the one that the adapter supports as well.
 
         # Note that the charge of an electron is -e, not e
         return self.integrate(func="CHAR", time=time, nplc=nplc) / -elementary_charge
