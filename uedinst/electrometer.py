@@ -172,9 +172,9 @@ class Keithley6514(GPIBBase):
         to_arr = lambda iterable: np.fromiter(
             map(float, iterable), dtype=np.float, count=num_readings
         )
-        
+
         self.write("ARM:COUN 1")
-        self.write('TRIG:SOUR IMM')
+        self.write("TRIG:SOUR IMM")
         self.write(f"TRIG:COUN {int(num_readings)}")
 
         self.write("TRAC:CLE")
