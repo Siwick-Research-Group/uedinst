@@ -144,11 +144,11 @@ class GatanUltrascan895(TCPBase):
         )
         sleep(exposure)
         _ = self.read_answer()  # Error check
-        
-        # It would appear that if remove_dark and normalize_gain are both equal, 
+
+        # It would appear that if remove_dark and normalize_gain are both equal,
         # then the data-type is uint16
-        
-        if (remove_dark == normalize_gain):
+
+        if remove_dark == normalize_gain:
             raw_dtype = np.uint16
         else:
             raw_dtype = np.int32
@@ -158,7 +158,7 @@ class GatanUltrascan895(TCPBase):
         # Therefore, better to get to the raw data and cast ourselves.
         with open(self.temp_image_fname, mode="rb") as datafile:
             arr = np.fromfile(datafile, dtype=raw_dtype).reshape((2048, 2048))
-        
+
         # Gatan Ultrascan 895 can't actually detect higher than ~30 000 counts
         # Therefore, we can safely cast as int16 (after clipping)
         np.clip(arr, INT16INFO.min, INT16INFO.max, out=arr)
@@ -241,7 +241,7 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         # The method above is blocking, so we are safe to ask for an answer at this time.
         _ = self.read_answer()  # error check
 
-        if (remove_dark == normalize_gain):
+        if remove_dark == normalize_gain:
             raw_dtype = np.uint16
         else:
             raw_dtype = np.int32
@@ -251,7 +251,7 @@ class GatanUltrascan895WithElectrometer(GatanUltrascan895):
         # Therefore, better to get to the raw data and cast ourselves.
         with open(self.temp_image_fname, mode="rb") as datafile:
             arr = np.fromfile(datafile, dtype=raw_dtype).reshape((2048, 2048))
-        
+
         # Gatan Ultrascan 895 can't actually detect higher than ~30 000 counts
         # Therefore, we can safely cast as int16 (after clipping)
         np.clip(arr, INT16INFO.min, INT16INFO.max, out=arr)
