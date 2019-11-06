@@ -55,7 +55,7 @@ class TekDMM4040(GPIBBase):
         if errors[0:2] == "+0":
             return None
         return errors
-    
+
     def voltage(self):
         """ Measure the instantaneous DC voltage """
         return float(self.query("MEAS:DC?"))

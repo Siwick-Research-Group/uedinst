@@ -1,6 +1,5 @@
-
-
 from .base import SerialBase
+
 
 class PolySciCirc(SerialBase):
     """
@@ -13,7 +12,9 @@ class PolySciCirc(SerialBase):
 	kwargs
 		Keyword-arguments are passed to serial.Serial class.
 	"""
+
     BAUDRATES = (57600,)
+
     def gettemp(self):
         """
         Reads temperature from the circulator
@@ -24,7 +25,8 @@ class PolySciCirc(SerialBase):
         """
         value = self.query("RS")
         return float(value[0:6])
-    def settemp(self,T):
+
+    def settemp(self, T):
         """
         Adjusts set point of circulator
 
@@ -38,17 +40,10 @@ class PolySciCirc(SerialBase):
         ValueError: if T > 999.99
         """
         T = float(T)
-        if T>999.99:
+        if T > 999.99:
             raise ValueError("New set point must be less than 1000.00 C")
-        if T<100:
-            T=f"{T:0>6.2f}"
+        if T < 100:
+            T = f"{T:0>6.2f}"
         else:
             T = f"{T:.2f}"
         self.write(f"SS{T}")
-
-
-
-
-
-
-
