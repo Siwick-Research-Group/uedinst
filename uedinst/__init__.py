@@ -33,3 +33,4 @@ from .psupply import HeinzingerPNChp
 from .shutter import SC10Shutter
 from .temperature import ITC503
 from .utils import is_valid_IP, timeout
+from .circulator import PolySciCirc
