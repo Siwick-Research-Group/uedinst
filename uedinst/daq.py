@@ -12,12 +12,31 @@ class PCI6281:
     def __init__(self, *args, **kwargs):
         pass
 
-    def set_voltage(self, value, timeout=None):
+    def read_voltage(self, channel):
+        """
+        Read instantaneous voltage value from an input channel.
+
+        Parameters
+        ----------
+        channel : string
+            Input channel, e.g. "Dev1/ai0"
+        
+        Returns
+        -------
+        voltage : float
+        """
+        with nidaqmx.Task() as task:
+            task.ai_channels.add_ai_voltage_chan(channel)
+            return task.read()
+
+    def set_voltage(self, channel, value, timeout=None):
         """
         Set voltage on the output channel.
 
         Parameters
         ----------
+        channel: string
+            Output channel, e.g. "Dev1/ao1"
         value : float
             Voltage value [V]
         timeout : float or None, optional
@@ -40,7 +59,7 @@ class PCI6281:
                 )
 
         with nidaqmx.Task() as task:
-            task.ao_channels.add_ao_voltage_chan("Dev1/ao1")
+            task.ao_channels.add_ao_voltage_chan(channel)
             task.write(value)
             task.stop()
             if timeout is not None:
