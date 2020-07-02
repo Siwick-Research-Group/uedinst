@@ -1,4 +1,5 @@
 from .base import SerialBase
+import serial
 
 
 class PolySciCirc(SerialBase):
@@ -15,6 +16,13 @@ class PolySciCirc(SerialBase):
 
     BAUDRATES = (57600,)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            *args,
+            timeout=1,
+            **kwargs,
+        )
+
     def gettemp(self):
         """
         Reads temperature from the circulator
@@ -23,7 +31,9 @@ class PolySciCirc(SerialBase):
         ----------
         n/a
         """
-        value = self.query("RS")
+        self.write_str("RS\r")
+        value = self.read()
+        print("VALUE: ", value)
         return float(value[0:6])
 
     def settemp(self, T):
