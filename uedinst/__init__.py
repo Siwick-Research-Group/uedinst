@@ -2,7 +2,7 @@
 __author__ = "Laurent P. René de Cotret"
 __email__ = "laurent.renedecotret@mail.mcgill.ca"
 __license__ = "Proprietary"
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 
 class InstrumentException(Exception):
