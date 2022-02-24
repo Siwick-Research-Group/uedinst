@@ -3,13 +3,10 @@ import os
 import platform
 from pathlib import Path
 
-# Installation location by XILab
-os.chdir("C:\\Program Files\\XILab (variable attenuator)")
-
 # use cdecl on unix and stdcall on windows
 def ximc_shared_lib():
     if platform.system() == "Windows":
-        return WinDLL("libximc.dll")
+        return WinDLL("C:\\Program Files\\XILab (variable attenuator)\\libximc.dll")
     else:
         return None
 
