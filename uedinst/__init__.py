@@ -2,7 +2,7 @@
 __author__ = "Laurent P. René de Cotret"
 __email__ = "laurent.renedecotret@mail.mcgill.ca"
 __license__ = "Proprietary"
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 
 class InstrumentException(Exception):
@@ -18,7 +18,6 @@ class InstrumentWarning(UserWarning):
 
 
 from .base import TCPBase, GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
-
 from .attenuator import VariableAttenuator
 from .daq import PCI6281
 from .delay_stage import ILS250PP
