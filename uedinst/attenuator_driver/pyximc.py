@@ -1,6 +1,8 @@
 from ctypes import *
 import os
 import platform
+import warnings
+from .. import InstrumentWarning
 from pathlib import Path
 
 # use cdecl on unix and stdcall on windows
@@ -10,8 +12,10 @@ def ximc_shared_lib():
     else:
         return None
 
-
-lib = ximc_shared_lib()
+try:
+    lib = ximc_shared_lib()
+except FileNotFoundError:
+    warnings.warn("could not find XILab's libximc.dll", InstrumentWarning)
 
 # Common declarations
 
@@ -47,8 +51,9 @@ class device_network_information_t(LittleEndianStructure):
 
 # Clarify function types
 
-lib.enumerate_devices.restype = POINTER(device_enumeration_t)
-lib.get_device_name.restype = c_char_p
+if lib is not None:
+    lib.enumerate_devices.restype = POINTER(device_enumeration_t)
+    lib.get_device_name.restype = c_char_p
 
 
 # ---------------------------
