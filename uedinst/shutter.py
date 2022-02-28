@@ -54,6 +54,11 @@ class SC10Shutter(SerialBase):
         return int(self.query_str("open?"))
 
     @property
+    def shutter_close_time(self):
+        """ Shutter close time in milliseconds """
+        return int(self.query_str("shut?"))        
+
+    @property
     def repeat_count(self):
         """ Repeat count of operating mode 'repeat' """
         return int(self.query_str("rep?"))
@@ -190,9 +195,21 @@ class SC10Shutter(SerialBase):
 		Parameters
 		----------
 		ms : int
-			Open time in millisecond
+			Open time in milliseconds
 		"""
         self.query_str("open={}".format(int(ms)))
+
+    @clear_on_error
+    def set_close_time(self, ms):
+        """
+        Set shutter close time
+        
+        Parameters
+        ----------
+        ms : int
+            Close time in milliseconds
+        """
+        self.query_str("shut={}".format(int(ms)))
 
     @clear_on_error
     def set_repeat_count(self, count):
