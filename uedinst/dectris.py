@@ -882,3 +882,14 @@ class Quadro(DEigerClient):
         if mode not in allowed:
             raise InstrumentException(f'trigger mode {mode} not allowed; use one of {allowed}')
         self.set_detector_config('trigger_mode', mode)
+
+    @property
+    def counting_mode(self):
+        return self.detector_config('counting_mode')['value']
+
+    @counting_mode.setter
+    def counting_mode(self, mode):
+        allowed = self.detector_config('counting_mode')['allowed_values']
+        if mode not in allowed:
+            raise InstrumentException(f'counting mode {mode} not allowed; use one of {allowed}')
+        self.set_detector_config('counting_mode', mode)
