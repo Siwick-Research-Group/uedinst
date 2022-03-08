@@ -826,12 +826,16 @@ class Quadro(DEigerClient):
         """
         get basic detector info from print function
         """
-        return f'Detector:                 {self.description}\n' \
-               f'Serial:                   {self.detector_number}\n' \
-               f'Eiger FW Version:         {self.eiger_fw_version}\n' \
-               f'Decetor software Version: {self.software_version}\n' \
-               f'Resolution:               {self.x_pixels_in_detector}x{self.y_pixels_in_detector}\n' \
-               f'Pixel size:               {self.x_pixel_size * 1e6}x{self.y_pixel_size * 1e6} µm^2'
+        try:
+            return f'Detector:                 {self.description}\n' \
+                f'Serial:                   {self.detector_number}\n' \
+                f'Eiger FW Version:         {self.eiger_fw_version}\n' \
+                f'Decetor software Version: {self.software_version}\n' \
+                f'Resolution:               {self.x_pixels_in_detector}x{self.y_pixels_in_detector}\n' \
+                f'Pixel size:               {self.x_pixel_size * 1e6}x{self.y_pixel_size * 1e6} µm^2'
+        except RuntimeError:
+            # can occur when detector forgets who it is; just return gibberish memory location as usual
+            return object.__str__(self)
 
     def __make_command_method(self, command):
         """
