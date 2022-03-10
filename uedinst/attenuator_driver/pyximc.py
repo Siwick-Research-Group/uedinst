@@ -8,9 +8,12 @@ from pathlib import Path
 # use cdecl on unix and stdcall on windows
 def ximc_shared_lib():
     if platform.system() == "Windows":
-        return WinDLL("C:\\Program Files\\XILab (variable attenuator)\\libximc.dll")
-    else:
-        return None
+        path = os.getcwd()
+        os.chdir("C:\\Program Files\\XILab (variable attenuator)")
+        dll = WinDLL("libximc.dll")
+        os.chdir(path)
+        return dll    
+    return
 
 try:
     lib = ximc_shared_lib()
