@@ -1,6 +1,27 @@
-from . import GPIBBase
+from . import GPIBBase, SerialBase
 
+class TTiTF930(SerialBase):
+    """
+    Interface to TTi TF930 Frequency Counter.
+    
+    the frequency currently displayed on the device (valid or not) can be read via the
+    frequency property of this class
+    """
+    def __init__(self, port, **kwargs):
+        kwargs.update({"port": port, "baudrate": 115200, "timeout": 1.0})
+        super().__init__(**kwargs)
+        self.clear()
 
+    def close(self):
+        self.clear()
+        super().close()
+
+    @property
+    def frequency(self):
+        self.write_str('?\n')
+        return float(self.readline().decode('UTF-8').replace('Hz\r\n', ''))
+
+# class below is obsolete; device physically broke
 class RacalDana1991(GPIBBase):
     """
     Interface to Racal-Dana 1991 Frequency Counter. 
