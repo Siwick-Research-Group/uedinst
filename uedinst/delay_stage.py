@@ -100,7 +100,8 @@ class DelayStage(AbstractContextManager):
         # Reset state by killing the group, and initializing again
         # Note: GroupKill returns [errcode, string] for some reason
         # even though documentation doesn't say that
-        _errcheck(self._driver.KillAll(self.socket_id))
+#         _errcheck(self._driver.KillAll(self.socket_id))
+        _errcheck(self._driver.GroupKill(self.socket_id, self.group))
         _errcheck(self._driver.GroupInitialize(self.socket_id, self.group))
         _errcheck(self._driver.GroupHomeSearch(self.socket_id, self.group))
 
