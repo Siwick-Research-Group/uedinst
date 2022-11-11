@@ -62,57 +62,22 @@ def _errcheck(returned):
             raise InstrumentException(error)
     return returned
 
+class Stage():
+    def __init__(self, name, Driver, socket_id):
+        # self.group, self.positioner =  self._get_group_and_positioner_from_name(name)
+        self._driver = Driver
+        self.socket_id = socket_id
 
-class DelayStage(AbstractContextManager):
-    """
-    Abstract interface to one delay-stage
-    connected to a Newport XPS C8.
-
-    Parameters
-    ----------
-    address : str, optional
-        IP address of the XPS, e.g. '192.168.33.101'.
-
-    Raises
-    ------
-    ValueError : if ``address`` is an invalid IPv4 address.
-    InstrumentException : if any connection error occurs.
-    """
-
-    _driver = XPS()
-
-    # group and positioner must be overriden in subclasses
-    group = ""
-    positioner = group + ""
-
-    def __init__(self, address, **kwargs):
-        # self.socket_id = None
-
-        # According to TCP_ConnectToServer documentation,
-        # port is always 5001
-        if not is_valid_IP(address):
-            raise ValueError("{} is an invalid IPv4 address".format(address))
-
-        self.socket_id = _errcheck(
-            self._driver.TCP_ConnectToServer(IP=address, port=5001, timeOut=10)
-        )
-
-        # Reset state by killing the group, and initializing again
-        # Note: GroupKill returns [errcode, string] for some reason
-        # even though documentation doesn't say that
-#         _errcheck(self._driver.KillAll(self.socket_id))
-        _errcheck(self._driver.GroupKill(self.socket_id, self.group))
-        _errcheck(self._driver.GroupInitialize(self.socket_id, self.group))
-        _errcheck(self._driver.GroupHomeSearch(self.socket_id, self.group))
-
-        # Get position limits
         errcode, self.min_limit, self.max_limit = _errcheck(
-            self._driver.PositionerUserTravelLimitsGet(self.socket_id, self.positioner)
+        self._driver.PositionerUserTravelLimitsGet(self.socket_id, name)
         )
 
-    def __exit__(self, *args, **kwargs):
-        self.disconnect()
-        super().__exit__(*args, **kwargs)
+
+class DelayStage(Stage):
+    def __init__(self, name, Driver, socket_id):
+        super().__init__(name, Driver, socket_id)
+        self.name = name
+        
 
     @staticmethod
     def delay_to_distance(delay):
@@ -136,10 +101,6 @@ class DelayStage(AbstractContextManager):
         # this means that increasing distance -> earlier probing
         extra_path = 2 * float(dist) / 1e3  # extra path [meters]
         return -1 * (extra_path / c_air) * 1e12  # [picoseconds]
-
-    def disconnect(self):
-        """ Disconnect from the XPS """
-        self._driver.TCP_CloseSocket(self.socket_id)
 
     def _wait_end_of_move(self, tout=10, tol=5e-3):
         """ 
@@ -167,7 +128,7 @@ class DelayStage(AbstractContextManager):
         """
         errcode, position = _errcheck(
             self._driver.GroupPositionTargetGet(
-                self.socket_id, self.positioner, nbElement=1
+                self.socket_id, self.name, nbElement=1
             )
         )
         return float(position)
@@ -182,7 +143,7 @@ class DelayStage(AbstractContextManager):
         """
         errcode, position = _errcheck(
             self._driver.GroupPositionCurrentGet(
-                self.socket_id, self.positioner, nbElement=1
+                self.socket_id, self.name, nbElement=1
             )
         )
         return float(position)
@@ -201,7 +162,7 @@ class DelayStage(AbstractContextManager):
         # For some reason, the targetDisplacement parameter
         # to GroupMoveRelative should be an iterable...
         _errcheck(
-            self._driver.GroupMoveRelative(self.socket_id, self.positioner, [move])
+            self._driver.GroupMoveRelative(self.socket_id, self.name, [move])
         )
         return self._wait_end_of_move()
 
@@ -219,7 +180,7 @@ class DelayStage(AbstractContextManager):
         # For some reason, the targetDisplacement parameter
         # to GroupMoveAbsolute should be an iterable...
         _errcheck(
-            self._driver.GroupMoveAbsolute(self.socket_id, self.positioner, [move])
+            self._driver.GroupMoveAbsolute(self.socket_id, self.name, [move])
         )
         return self._wait_end_of_move()
 
@@ -251,17 +212,59 @@ class DelayStage(AbstractContextManager):
         time, tzero_position = float(time), float(tzero_position)
         return self.absolute_move(self.delay_to_distance(time) + tzero_position)
 
+    pass
 
-class ILS250PP(DelayStage):
-    """
-    Interface to an ILS250PP delay-stage connected
-    to a Newport XPS C8 positioner.
-    """
+class RotationStage(Stage):
+    pass
 
-    group = "GROUP5"
-    positioner = group + ".POSITIONER"
 
-    # Internet address : 132.206.175.95
-    # local address    : 192.168.254.254
-    def __init__(self, address="192.168.254.254", **kwargs):
-        super().__init__(address, **kwargs)
+class XPSController():
+    _driver = XPS()
+
+    __delay_stage_name = "M.DelayStage"
+    __compensation_stage_name = "M.CompensationStage"
+    __rot_stage_name = "M.RotationStage"
+
+    def __init__(self, ip="192.168.254.254", port=5001):
+        self.group =self._get_group_and_positioner_from_name(self.__delay_stage_name)[0]
+
+        # According to TCP_ConnectToServer documentation,
+        # port is always 5001
+        if not is_valid_IP(ip):
+            raise ValueError("{} is an invalid IPv4 address".format(ip))
+
+        # Reset state by killing the group, and initializing again
+        # Note: GroupKill returns [errcode, string] for some reason
+        # even though documentation doesn't say that
+        #_errcheck(self._driver.KillAll(self.socket_id)) #replace with group kill
+
+        self.socket_id = _errcheck(
+            self._driver.TCP_ConnectToServer(IP=ip, port=port, timeOut=10)
+        )
+
+        _errcheck(self._driver.GroupKill(self.socket_id, self.group))
+        _errcheck(self._driver.GroupInitialize(self.socket_id, self.group))
+        _errcheck(self._driver.GroupHomeSearch(self.socket_id, self.group))
+
+       
+        self.delay_stage = DelayStage(self.__delay_stage_name, self._driver, self.socket_id)
+        self.compensation_stage = DelayStage(self.__compensation_stage_name, self._driver, self.socket_id)
+        self.rotation_stage = RotationStage(self.__rot_stage_name, self._driver, self.socket_id)
+
+    def disconnect(self):
+        """ Disconnect from the XPS """
+        self._driver.TCP_CloseSocket(self.socket_id)
+
+    def __del__(self, *args, **kwargs):
+        self.disconnect()
+
+    def __exit__(self, *args, **kwargs):
+        self.disconnect()
+
+    def _get_group_and_positioner_from_name(self,name):
+        """generates group and positioner string from __xxx_stage_name
+        name (string) 
+        returns 
+        (list) = [GROUP, POSITIONER]
+        """
+        return name.split(".")
