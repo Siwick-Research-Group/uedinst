@@ -20,7 +20,7 @@ class InstrumentWarning(UserWarning):
 from .base import TCPBase, GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
 from .attenuator import VariableAttenuator
 from .daq import PCI6281
-from .delay_stage import ILS250PP
+from .delay_stage import XPSController
 from .electrometer import Keithley6514
 from .freq_counter import RacalDana1991, TTiTF930
 from .gatan import GatanUltrascan895, GatanUltrascan895WithElectrometer
