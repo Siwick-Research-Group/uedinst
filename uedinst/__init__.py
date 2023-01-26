@@ -17,6 +17,7 @@ class InstrumentWarning(UserWarning):
     pass
 
 
+import os
 from .base import TCPBase, GPIBBase, SerialBase, RS485Base, MetaInstrument, Singleton
 from .attenuator import VariableAttenuator
 from .daq import PCI6281
@@ -33,3 +34,10 @@ from .shutter import SC10Shutter
 from .tempcontroller import ITC503
 from .utils import is_valid_IP, timeout
 from .circulator import PolySciCirc
+
+
+def get_base_path():
+    """
+    returns package base dir
+    """
+    return os.path.dirname(__file__)
