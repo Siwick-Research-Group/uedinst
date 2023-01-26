@@ -4,10 +4,10 @@ import json
 from . import get_base_path
 
 
-IP = 'localhost'
+IP = "localhost"
 PORT = 8080
-DACS_FILE = os.path.join(get_base_path, 'cheetah_configs', 'tpx3-demo.dacs')
-BPC_FILE = os.path.join(get_base_path, 'cheetah_configs', 'tpx3-demo.bpc')
+DACS_FILE = os.path.join(get_base_path(), "cheetah_configs", "tpx3-demo.dacs")
+BPC_FILE = os.path.join(get_base_path(), "cheetah_configs", "tpx3-demo.bpc")
 
 
 class CheetahGetException(Exception):
@@ -61,7 +61,7 @@ class Cheetah:
     @dacs.setter
     def dacs(self, dacs):
         self.__get_request("/config/load?format=dacs&file=" + dacs)
-    
+
     @property
     def bpc(self):
         return self._bpc
@@ -74,14 +74,18 @@ class Cheetah:
         url = self.url + url_extension
         response = requests.get(url=url)
         if response.status_code != 200:
-            raise CheetahGetException(f"Failed GET request: {url}, {response.status_code}: {response.text}")
+            raise CheetahGetException(
+                f"Failed GET request: {url}, {response.status_code}: {response.text}"
+            )
         return response
 
     def __put_request(self, url_extension, data):
         url = self.url + url_extension
         response = requests.put(url=url, data=data)
         if response.status_code != 200:
-            raise CheetahGetException(f"Failed PUT request: {url}, {response.status_code}: {response.text}")
+            raise CheetahGetException(
+                f"Failed PUT request: {url}, {response.status_code}: {response.text}"
+            )
         return response
 
 
