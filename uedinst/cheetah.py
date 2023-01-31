@@ -57,6 +57,37 @@ class AwareAttrDict(dict):
         pass
 
 
+def strip_awareattrdict(aad):
+    plain_dict = {}
+    for k, v in aad.items():
+        if not k.startswith("_"):
+            plain_dict[k] = v
+            if isinstance(v, AwareAttrDict):
+                plain_dict[k] = strip_awareattrdict(v)
+    return plain_dict
+
+
+# class ConfigEncoder(json.JSONEncoder):
+#     def default(self, o):
+#         print(type(o))
+#         return []
+
+# class ConfigEncoder(json.JSONEncoder):
+#     def __init__(self, *args, skipkeys=True, check_circular=False, **kwargs):
+#         kwargs["skipkeys"] = kwargs.get("skipkeys")
+#         kwargs["check_circular"] = kwargs.get("check_circular")
+#         super().__init__(*args, **kwargs)
+#
+#     def encode(self, o):
+#         print(o.__class__.__name__)
+#         if hasattr(o, '_AwareAttrDict__parent'):
+#             o.pop('_AwareAttrDict__parent')
+#         super().encode(o)
+#
+#     def default(self, o):
+#         return
+
+
 class Cheetah:
     def __init__(self, ip, port, dacs_file=None, bpc_file=None):
         self._url = f"http://{ip}:{port}"
@@ -70,11 +101,6 @@ class Cheetah:
 
         self.__get_request("")  # check if interface is reachable
 
-    def __setattr__(self, key, val):
-        if not key.startswith("_"):
-            print(key, val)
-        return super().__setattr__(key, val)
-
     def acquire(self):
         self.__get_request("/measurement/start")
 
@@ -84,7 +110,7 @@ class Cheetah:
 
     @Config.setter
     def Config(self, config):
-        self.__put_request("/detector/config", config)
+        self.__put_request("/*", config)
 
     @property
     def Dacs(self):
@@ -122,7 +148,7 @@ class Cheetah:
             return response.text
 
     def __put_request(self, url_extension, data):
-        url = self.url + url_extension
+        url = self._url + url_extension
         response = requests.put(url=url, data=json.dumps(data))
         if response.status_code != 200:
             raise CheetahGetException(
@@ -131,7 +157,11 @@ class Cheetah:
         return json.loads(response.text)
 
     def _entry_changed_action(self):
-        print("update config!")
+        # print('update conf')
+        new_config = {"Detector": self.Detector, "Measurement": self.Measurement, "Server": self.Server}
+        new_config = strip_awareattrdict(new_config)
+        json.dumps(new_config)
+        self.Config = new_config
 
 
 if __name__ == "__main__":
