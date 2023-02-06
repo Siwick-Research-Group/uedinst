@@ -89,6 +89,9 @@ def strip_awareattrdict(aad):
 
 
 class Cheetah:
+    VALID_FLIPS = ["horizontal", "vertical"]
+    VALID_ROTATIONS = ["left", "right", "180"]
+
     def __init__(self, ip, port, dacs_file=None, bpc_file=None):
         self._url = f"http://{ip}:{port}"
         # upload DACS and BPC
@@ -175,6 +178,27 @@ class Cheetah:
     def preview(self):
         self.__get_request("/measurement/preview")
 
+    def change_orientation(self, flip=None, rotation=None, reset=True):
+        command = "?"
+        if reset:
+            command += "reset&"
+
+        if flip is not None:
+            if flip.lower() not in self.VALID_FLIPS:
+                raise CheetahGetException(f"{flip.lower()} is not a valid flip command; use one of {self.VALID_FLIPS}")
+            command += f"flip={flip.lower()}&"
+
+        if rotation is not None:
+            rotation = str(rotation)
+            if rotation.lower() not in self.VALID_ROTATIONS:
+                raise CheetahGetException(f"{rotation.lower()} is not a valid rotation command; use on of {self.VALID_ROTATIONS}")
+            command += f"rotation={rotation.lower()}&"
+
+        if command.endswith("&"):
+            command = command[:-1]
+
+        self.__get_request(f"/detector/layout/{command}")
+
 
 if __name__ == "__main__":
     # C = Cheetah(IP, PORT, DACS_FILE, BPC_FILE)
@@ -195,3 +219,4 @@ if __name__ == "__main__":
     # C.Detector.Config.nTriggers = 5
     # C.Detector.Config.nTriggers = 50
     # C.Detector.Config.nTriggers = 5
+    C.change_orientation(flip='horizontal', rotation=180, reset=True)
