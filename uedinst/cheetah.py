@@ -67,27 +67,6 @@ def strip_awareattrdict(aad):
     return plain_dict
 
 
-# class ConfigEncoder(json.JSONEncoder):
-#     def default(self, o):
-#         print(type(o))
-#         return []
-
-# class ConfigEncoder(json.JSONEncoder):
-#     def __init__(self, *args, skipkeys=True, check_circular=False, **kwargs):
-#         kwargs["skipkeys"] = kwargs.get("skipkeys")
-#         kwargs["check_circular"] = kwargs.get("check_circular")
-#         super().__init__(*args, **kwargs)
-#
-#     def encode(self, o):
-#         print(o.__class__.__name__)
-#         if hasattr(o, '_AwareAttrDict__parent'):
-#             o.pop('_AwareAttrDict__parent')
-#         super().encode(o)
-#
-#     def default(self, o):
-#         return
-
-
 class Cheetah:
     VALID_FLIPS = ["horizontal", "vertical"]
     VALID_ROTATIONS = ["left", "right", "180"]
@@ -113,7 +92,8 @@ class Cheetah:
 
     @Config.setter
     def Config(self, config):
-        self.__put_request("/*", config)
+        self.__put_request("/detector/config", config["Detector"]["Config"])
+        self.__put_request("/measurement/config", config["Measurement"]["Config"])
 
     @property
     def Dacs(self):
@@ -157,7 +137,10 @@ class Cheetah:
             raise CheetahGetException(
                 f"Failed PUT request: {url}, {response.status_code}: {response.text}"
             )
-        return json.loads(response.text)
+        try:
+            return json.loads(response.text)
+        except json.JSONDecodeError:
+            return response.text
 
     def _entry_changed_action(self):
         # print('update conf')
@@ -216,7 +199,6 @@ if __name__ == "__main__":
     # print(C.Measurement.Config.Corrections)
     # C.Detector["Config"]["nTriggers"] = 5
     # C.Detector["Config"]["nTriggers"] = 50
-    # C.Detector.Config.nTriggers = 5
-    # C.Detector.Config.nTriggers = 50
-    # C.Detector.Config.nTriggers = 5
+    C.Detector.Config.nTriggers = 5
+    C.Detector.Config.nTriggers = 50
     C.change_orientation(flip='horizontal', rotation=180, reset=True)
