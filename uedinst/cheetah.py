@@ -163,6 +163,18 @@ class Cheetah:
         json.dumps(new_config)
         self.Config = new_config
 
+    def shutdown(self):
+        self.__get_request("/server/shutdown")
+
+    def start(self):
+        self.__get_request("/measurement/start")
+
+    def stop(self):
+        self.__get_request("/measurement/stop")
+
+    def preview(self):
+        self.__get_request("/measurement/preview")
+
 
 if __name__ == "__main__":
     # C = Cheetah(IP, PORT, DACS_FILE, BPC_FILE)
@@ -180,7 +192,6 @@ if __name__ == "__main__":
     # print(C.Measurement.Config.Corrections)
     # C.Detector["Config"]["nTriggers"] = 5
     # C.Detector["Config"]["nTriggers"] = 50
-    C.Detector.Config.nTriggers = 5
-    C.Detector.Config.nTriggers = 50
     # C.Detector.Config.nTriggers = 5
-
+    # C.Detector.Config.nTriggers = 50
+    # C.Detector.Config.nTriggers = 5
