@@ -93,7 +93,7 @@ class Cheetah:
     @Config.setter
     def Config(self, config):
         self.__put_request("/detector/config", config["Detector"]["Config"])
-        self.__put_request("/measurement/config", config["Measurement"]["Config"])
+        self.__put_request("/server/destination", config["Server"]["Destination"])
 
     @property
     def Dacs(self):
@@ -200,5 +200,12 @@ if __name__ == "__main__":
     # C.Detector["Config"]["nTriggers"] = 5
     # C.Detector["Config"]["nTriggers"] = 50
     C.Detector.Config.nTriggers = 5
-    C.Detector.Config.nTriggers = 50
-    C.change_orientation(flip='horizontal', rotation=180, reset=True)
+    # C.Detector.Config.nTriggers = 50
+
+    C.Server.Destination = {"Raw": [{"Base": "file:/some/dir",
+                                    "FilePattern": "f%Hms_",
+                                    "SplitStrategy": "FRAME",
+                                    "QueueSize": 16384}]
+                            }
+
+    # C.change_orientation(flip='horizontal', rotation=180, reset=True)
