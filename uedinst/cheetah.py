@@ -144,7 +144,11 @@ class Cheetah:
 
     def _entry_changed_action(self):
         # print('update conf')
-        new_config = {"Detector": self.Detector, "Measurement": self.Measurement, "Server": self.Server}
+        new_config = {
+            "Detector": self.Detector,
+            "Measurement": self.Measurement,
+            "Server": self.Server,
+        }
         new_config = strip_awareattrdict(new_config)
         json.dumps(new_config)
         self.Config = new_config
@@ -168,13 +172,17 @@ class Cheetah:
 
         if flip is not None:
             if flip.lower() not in self.VALID_FLIPS:
-                raise CheetahGetException(f"{flip.lower()} is not a valid flip command; use one of {self.VALID_FLIPS}")
+                raise CheetahGetException(
+                    f"{flip.lower()} is not a valid flip command; use one of {self.VALID_FLIPS}"
+                )
             command += f"flip={flip.lower()}&"
 
         if rotation is not None:
             rotation = str(rotation)
             if rotation.lower() not in self.VALID_ROTATIONS:
-                raise CheetahGetException(f"{rotation.lower()} is not a valid rotation command; use on of {self.VALID_ROTATIONS}")
+                raise CheetahGetException(
+                    f"{rotation.lower()} is not a valid rotation command; use on of {self.VALID_ROTATIONS}"
+                )
             command += f"rotation={rotation.lower()}&"
 
         if command.endswith("&"):
@@ -202,10 +210,15 @@ if __name__ == "__main__":
     C.Detector.Config.nTriggers = 5
     # C.Detector.Config.nTriggers = 50
 
-    C.Server.Destination = {"Raw": [{"Base": "file:/some/dir",
-                                    "FilePattern": "f%Hms_",
-                                    "SplitStrategy": "FRAME",
-                                    "QueueSize": 16384}]
-                            }
+    C.Server.Destination = {
+        "Raw": [
+            {
+                "Base": "file:/some/dir",
+                "FilePattern": "f%Hms_",
+                "SplitStrategy": "FRAME",
+                "QueueSize": 16384,
+            }
+        ]
+    }
 
     # C.change_orientation(flip='horizontal', rotation=180, reset=True)
