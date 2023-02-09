@@ -62,6 +62,7 @@ def _errcheck(returned):
             raise InstrumentException(error)
     return returned
 
+
 class Stage():
     def __init__(self, name, Driver, socket_id):
         # self.group, self.positioner =  self._get_group_and_positioner_from_name(name)
@@ -69,7 +70,7 @@ class Stage():
         self.socket_id = socket_id
 
         errcode, self.min_limit, self.max_limit = _errcheck(
-        self._driver.PositionerUserTravelLimitsGet(self.socket_id, name)
+            self._driver.PositionerUserTravelLimitsGet(self.socket_id, name)
         )
 
 
@@ -77,7 +78,6 @@ class DelayStage(Stage):
     def __init__(self, name, Driver, socket_id):
         super().__init__(name, Driver, socket_id)
         self.name = name
-        
 
     @staticmethod
     def delay_to_distance(delay):
@@ -136,7 +136,7 @@ class DelayStage(Stage):
     def current_position(self):
         """
         Get current absolute position
-        
+
         Returns
         -------
         pos : float
@@ -152,7 +152,7 @@ class DelayStage(Stage):
         """ 
         Move the delay stage relatively to current position, by distance. This
         function returns when move is completed.
-        
+
         Parameters
         ---------- 
         move : float
@@ -170,7 +170,7 @@ class DelayStage(Stage):
         """
         Move the delay stage to a new absolute position, by distance. This
         function returns when move is completed.
-        
+
         Parameters
         ---------- 
         move : float
@@ -214,6 +214,7 @@ class DelayStage(Stage):
 
     pass
 
+
 class RotationStage(Stage):
     pass
 
@@ -224,9 +225,10 @@ class XPSController():
     __delay_stage_name = "M.DelayStage"
     __compensation_stage_name = "M.CompensationStage"
     __rot_stage_name = "M.RotationStage"
+    __autocorr_stage_name = "M.AutocorrStage"
 
     def __init__(self, ip="192.168.254.254", port=5001):
-        self.group =self._get_group_and_positioner_from_name(self.__delay_stage_name)[0]
+        self.group = self._get_group_and_positioner_from_name(self.__delay_stage_name)[0]
 
         # According to TCP_ConnectToServer documentation,
         # port is always 5001
@@ -236,7 +238,7 @@ class XPSController():
         # Reset state by killing the group, and initializing again
         # Note: GroupKill returns [errcode, string] for some reason
         # even though documentation doesn't say that
-        #_errcheck(self._driver.KillAll(self.socket_id)) #replace with group kill
+        # _errcheck(self._driver.KillAll(self.socket_id)) #replace with group kill
 
         self.socket_id = _errcheck(
             self._driver.TCP_ConnectToServer(IP=ip, port=port, timeOut=10)
@@ -246,10 +248,10 @@ class XPSController():
         _errcheck(self._driver.GroupInitialize(self.socket_id, self.group))
         _errcheck(self._driver.GroupHomeSearch(self.socket_id, self.group))
 
-       
         self.delay_stage = DelayStage(self.__delay_stage_name, self._driver, self.socket_id)
         self.compensation_stage = DelayStage(self.__compensation_stage_name, self._driver, self.socket_id)
         self.rotation_stage = RotationStage(self.__rot_stage_name, self._driver, self.socket_id)
+        self.autocorr_stage = DelayStage(self.__autocorr_stage_name, self._driver, self.socket_id)
 
     def disconnect(self):
         """ Disconnect from the XPS """
@@ -261,7 +263,7 @@ class XPSController():
     def __exit__(self, *args, **kwargs):
         self.disconnect()
 
-    def _get_group_and_positioner_from_name(self,name):
+    def _get_group_and_positioner_from_name(self, name):
         """generates group and positioner string from __xxx_stage_name
         name (string) 
         returns 
