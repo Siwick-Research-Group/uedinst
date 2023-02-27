@@ -72,7 +72,7 @@ class Cheetah:
     VALID_ROTATIONS = ["left", "right", "180"]
 
     def __init__(self, ip, port, dacs_file=None, bpc_file=None):
-        self._url = f"http://{ip}:{port}"
+        self.url = f"http://{ip}:{port}"
         # upload DACS and BPC
         if dacs_file is not None:
             self._dacs = dacs_file
@@ -118,7 +118,7 @@ class Cheetah:
                 self.__dict__[k] = v
 
     def __get_request(self, url_extension):
-        url = self._url + url_extension
+        url = self.url + url_extension
         response = requests.get(url=url)
         if response.status_code != 200:
             raise CheetahGetException(
@@ -131,7 +131,7 @@ class Cheetah:
             return response.text
 
     def __put_request(self, url_extension, data):
-        url = self._url + url_extension
+        url = self.url + url_extension
         response = requests.put(url=url, data=json.dumps(data))
         if response.status_code != 200:
             raise CheetahGetException(
