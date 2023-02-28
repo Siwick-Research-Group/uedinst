@@ -8,7 +8,7 @@ Installation
 
 To install the latest development version from `Github <https://github.com/LaurentRDC/uedinst>`_::
 
-    python -m pip install git+git://github.com/Siwick-Research-Group/uedinst.git
+    python -m pip install git+https://github.com/Siwick-Research-Group/uedinst.git
 
 Each version is tested against Python 3.6+. If you are using a different version, tests can be run
 using the standard library's `unittest` module.
