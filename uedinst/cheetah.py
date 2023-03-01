@@ -82,6 +82,7 @@ class Cheetah:
             self.bpc = self._bpc
 
         self.__get_request("")  # check if interface is reachable
+        self.__update_info()
 
     def acquire(self):
         self.__get_request("/measurement/start")
@@ -143,7 +144,6 @@ class Cheetah:
             return response.text
 
     def _entry_changed_action(self):
-        # print('update conf')
         new_config = {
             "Detector": self.Detector,
             "Measurement": self.Measurement,
@@ -152,6 +152,7 @@ class Cheetah:
         new_config = strip_awareattrdict(new_config)
         json.dumps(new_config)
         self.Config = new_config
+        self.__update_info()
 
     def shutdown(self):
         self.__get_request("/server/shutdown")
